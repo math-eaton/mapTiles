@@ -20,10 +20,6 @@ from pathlib import Path
 from tqdm import tqdm
 import mercantile
 
-# Set up project paths
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-DATA_DIR = PROJECT_ROOT / "processing" / "data"
-OVERTURE_DATA_DIR = PROJECT_ROOT / "overture" / "data"
 
 def snap_to_tile_bounds(extent, zoom=8):
     """Snap extent to align with slippy tile boundaries to prevent rendering artifacts"""
@@ -80,7 +76,8 @@ def get_db_url(sql_section):
     
     return None
 
-def download_overture_data(extent, buffer_degrees=0.2, template_path=None, verbose=True):
+def download_overture_data(extent, buffer_degrees=0.2, template_path=None, verbose=True,
+                           project_root=None, overture_data_dir=None):
     """Download and process source data from Overture Maps
     
     Args:
@@ -88,11 +85,23 @@ def download_overture_data(extent, buffer_degrees=0.2, template_path=None, verbo
         buffer_degrees (float): Buffer around extent in degrees (default: 0.2)
         template_path (str|Path): Path to SQL template file (default: tileQueries.template)
         verbose (bool): Show progress information (default: True)
-    
+        project_root (str|Path|None): Optional project root path to override module default
+        overture_data_dir (str|Path|None): Optional data directory path to override module default
+
     Returns:
         dict: Results including processed files and any errors
     """
-    
+    # Resolve optional path overrides; fall back to module-level defaults if not provided
+    if project_root is not None:
+        PROJECT_ROOT = Path(project_root)
+    else:
+        PROJECT_ROOT = Path(__file__).resolve().parent.parent
+
+    if overture_data_dir is not None:
+        overture_data_dir = Path(overture_data_dir)
+    else:
+        overture_data_dir = PROJECT_ROOT / "data" / "raw" / "overture"
+
     # Snap extent to tile boundaries to prevent rendering artifacts
     snapped_extent = snap_to_tile_bounds(extent, zoom=8)
     extent_xmin, extent_ymin, extent_xmax, extent_ymax = snapped_extent
@@ -115,8 +124,7 @@ def download_overture_data(extent, buffer_degrees=0.2, template_path=None, verbo
         print()
     
     # Ensure directories exist
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
-    OVERTURE_DATA_DIR.mkdir(parents=True, exist_ok=True)
+    overture_data_dir.mkdir(parents=True, exist_ok=True)
     
     # Read the SQL template file
     if template_path is None:
@@ -131,9 +139,8 @@ def download_overture_data(extent, buffer_degrees=0.2, template_path=None, verbo
         template_content = file.read()
 
     # Replace template variables with actual paths
-    sql_content = template_content.replace('{{data_dir}}', str(DATA_DIR))
-    sql_content = sql_content.replace('{{overture_data_dir}}', str(OVERTURE_DATA_DIR))
-    
+    sql_content = template_content.replace('{{overture_data_dir}}', str(overture_data_dir))
+
     # Replace the extent variables with buffered extent
     sql_content = sql_content.replace('$extent_xmin', str(buffered_xmin))
     sql_content = sql_content.replace('$extent_xmax', str(buffered_xmax))
@@ -236,7 +243,6 @@ def main():
         extent=extent,
         buffer_degrees=args.buffer,
         template_path=args.template,
-        verbose=args.verbose
     )
     
     if results["success"]:

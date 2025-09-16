@@ -25,11 +25,14 @@ import argparse
 from pathlib import Path
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
-# Set up project paths
+# Set up project paths - aligned with notebook CONFIG
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-DATA_DIR = PROJECT_ROOT / "processing" / "data"
-TILE_DIR = PROJECT_ROOT / "processing" / "tiles"
-OVERTURE_DATA_DIR = PROJECT_ROOT / "overture" / "data"
+PROCESSING_DIR = PROJECT_ROOT / "processing"
+DATA_DIR = PROCESSING_DIR / "data"
+OVERTURE_DATA_DIR = DATA_DIR / "raw" / "overture"
+CUSTOM_DATA_DIR = DATA_DIR / "raw" / "grid3"
+OUTPUT_DIR = DATA_DIR / "processed"
+TILE_DIR = DATA_DIR / "tiles"
 PUBLIC_TILES_DIR = PROJECT_ROOT / "public" / "tiles"
 
 def validate_geojson(file_path):
@@ -153,7 +156,7 @@ def get_layer_tippecanoe_settings(layer_name, filename_or_path=None):
             filename = filename_or_path
             file_path = None
             # Try to find the file in data directories
-            for data_dir in [DATA_DIR, OVERTURE_DATA_DIR]:
+            for data_dir in [CUSTOM_DATA_DIR, OVERTURE_DATA_DIR, OUTPUT_DIR, DATA_DIR]:
                 potential_path = data_dir / filename
                 if potential_path.exists():
                     file_path = potential_path
@@ -203,6 +206,9 @@ def get_layer_tippecanoe_settings(layer_name, filename_or_path=None):
         elif 'roads' in filename_lower:
             layer_type = 'roads'
             detection_method = 'filename_pattern'
+        elif 'building' in filename_lower:
+            layer_type = 'buildings'
+            detection_method = 'filename_pattern'
         elif 'places' in filename_lower or 'placenames' in filename_lower:
             layer_type = 'places'
             detection_method = 'filename_pattern'
@@ -224,7 +230,7 @@ def get_layer_tippecanoe_settings(layer_name, filename_or_path=None):
     elif layer_type == 'settlement-extents':
         # Settlement extents with special preserved settings
         settings = [
-            '--simplification=5',
+            '--simplification=10',
             '--drop-rate=0.25',
             '--low-detail=11',
             '--full-detail=14',
@@ -269,6 +275,21 @@ def get_layer_tippecanoe_settings(layer_name, filename_or_path=None):
             '--coalesce-densest-as-needed',
             '--minimum-zoom=8',
             '--maximum-zoom=15',
+        ]
+
+    elif layer_type == 'buildings':
+        # Optimized for building footprints (high detail at close zooms)
+        settings = [
+            '--simplification=4',        # Slight simplification for buildings
+            '--drop-rate=0.05',          # Very conservative dropping
+            '--low-detail=12',           # High detail start for buildings
+            '--full-detail=15',          # Full detail at close zooms
+            '--coalesce-smallest-as-needed',
+            '--extend-zooms-if-still-dropping',
+            '--gamma=0.6',
+            '--maximum-zoom=16',         # Ensure buildings visible at highest zooms
+            '--minimum-zoom=12',         # Buildings at closer zooms only
+            '--buffer=12',               # Higher buffer for building features
         ]
     
     else:
@@ -318,15 +339,16 @@ def get_layer_tippecanoe_settings(layer_name, filename_or_path=None):
         elif geometry_type == 'Polygon':
             # Optimized for polygon features (default polygon settings)
             settings = [
-                '--simplification=5',        # Moderate simplification for polygons
+                # '--simplification=10',        # Moderate simplification for polygons
                 '--drop-rate=0.1',          # Conservative dropping
-                '--low-detail=10',          # Standard detail start
-                '--full-detail=13',         # Good full detail
+                '--low-detail=8',          # Standard detail start
+                '--full-detail=15',         # Good full detail
                 '--coalesce-smallest-as-needed',
                 '--extend-zooms-if-still-dropping',
                 '--gamma=0.5',              # Balanced density reduction
                 '--maximum-zoom=15',
                 '--minimum-zoom=8',         # Polygons at higher zooms
+                '--no-simplification-of-shared-nodes' # Preserve shared borders
             ]
         
         else:
@@ -470,9 +492,9 @@ def process_to_tiles(extent=None, input_dirs=None, filter_pattern=None,
     if verbose:
         print("=== PROCESSING TO TILES ===")
     
-    # Default input directories
+    # Default input directories - aligned with notebook CONFIG
     if input_dirs is None:
-        input_dirs = [DATA_DIR, OVERTURE_DATA_DIR]
+        input_dirs = [CUSTOM_DATA_DIR, OVERTURE_DATA_DIR]
     else:
         input_dirs = [Path(d) for d in input_dirs]
     

@@ -14,7 +14,7 @@ from typing import Dict, List, Set
 # Add the processing directory to the path so we can import from runCreateTiles
 sys.path.insert(0, str(Path(__file__).parent))
 
-from runCreateTiles import (
+from processing.scripts.runCreateTiles import (
     detect_geometry_type, 
     get_layer_tippecanoe_settings,
     DATA_DIR,

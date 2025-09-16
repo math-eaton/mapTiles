@@ -13,11 +13,11 @@ COPY (
         class,
         names.primary AS name,
         geometry -- DuckDB v.1.1.0 will autoload this as a `geometry` type
-    FROM read_parquet('s3://overturemaps-us-west-2/release/2025-06-25.0/theme=base/type=land/*', filename=true, hive_partitioning=1)
+    FROM read_parquet('s3://overturemaps-us-west-2/release/2025-08-20.1/theme=base/type=land/*', filename=true, hive_partitioning=1)
     WHERE
         bbox.xmin < $extent_xmax AND bbox.xmax > $extent_xmin
         AND bbox.ymin < $extent_ymax AND bbox.ymax > $extent_ymin
-) TO '{{data_dir}}/land.geojsonseq'
+) TO '{{overture_data_dir}}/land.geojsonseq'
 WITH (FORMAT GDAL, DRIVER 'GeoJSONSeq', SRS 'EPSG:4326');
 
 -- breakpoint
@@ -29,12 +29,12 @@ COPY (
         names.primary AS name,
         surface,
         geometry -- DuckDB v.1.1.0 will autoload this as a `geometry` type
-    FROM read_parquet('s3://overturemaps-us-west-2/release/2025-06-25.0/theme=base/type=land_use/*', filename=true, hive_partitioning=1)
+    FROM read_parquet('s3://overturemaps-us-west-2/release/2025-08-20.1/theme=base/type=land_use/*', filename=true, hive_partitioning=1)
     WHERE
         subtype NOT IN ('residential')
         AND bbox.xmin < $extent_xmax AND bbox.xmax > $extent_xmin
         AND bbox.ymin < $extent_ymax AND bbox.ymax > $extent_ymin
-) TO '{{data_dir}}/land_use.geojsonseq' WITH (FORMAT GDAL, DRIVER 'GeoJSONSeq', SRS 'EPSG:4326');
+) TO '{{overture_data_dir}}/land_use.geojsonseq' WITH (FORMAT GDAL, DRIVER 'GeoJSONSeq', SRS 'EPSG:4326');
 
 -- breakpoint
 
@@ -45,12 +45,12 @@ COPY (
         names.primary AS name,
         surface,
         geometry -- DuckDB v.1.1.0 will autoload this as a `geometry` type
-    FROM read_parquet('s3://overturemaps-us-west-2/release/2025-06-25.0/theme=base/type=land_use/*', filename=true, hive_partitioning=1)
+    FROM read_parquet('s3://overturemaps-us-west-2/release/2025-08-20.1/theme=base/type=land_use/*', filename=true, hive_partitioning=1)
     WHERE
         subtype IN ('residential')
         AND bbox.xmin < $extent_xmax AND bbox.xmax > $extent_xmin
         AND bbox.ymin < $extent_ymax AND bbox.ymax > $extent_ymin
-) TO '{{data_dir}}/land_residential.geojsonseq' WITH (FORMAT GDAL, DRIVER 'GeoJSONSeq', SRS 'EPSG:4326');
+) TO '{{overture_data_dir}}/land_residential.geojsonseq' WITH (FORMAT GDAL, DRIVER 'GeoJSONSeq', SRS 'EPSG:4326');
 
 -- breakpoint
 
@@ -62,7 +62,7 @@ COPY (
         geometry -- DuckDB v.1.1.0 will autoload this as a `geometry` type
     FROM 
         -- Uncomment one of the following sources:
-        read_parquet('s3://overturemaps-us-west-2/release/2025-06-25.0/theme=base/type=water/*', filename=true, hive_partitioning=1)
+        read_parquet('s3://overturemaps-us-west-2/release/2025-08-20.1/theme=base/type=water/*', filename=true, hive_partitioning=1)
         -- read_parquet('/path/to/geofabrik/water_features.parquet')
         -- read_shapefile('/path/to/natural_earth/water_features.shp')
     WHERE
@@ -81,7 +81,7 @@ COPY (
         class,
         subclass,
         geometry -- DuckDB v.1.1.0 will autoload this as a `geometry` type
-    FROM read_parquet('s3://overturemaps-us-west-2/release/2025-06-25.0/theme=transportation/type=segment/*', filename=true, hive_partitioning=1)
+    FROM read_parquet('s3://overturemaps-us-west-2/release/2025-08-20.1/theme=transportation/type=segment/*', filename=true, hive_partitioning=1)
     WHERE
         subtype = 'road'
         AND bbox.xmin < $extent_xmax AND bbox.xmax > $extent_xmin
@@ -97,7 +97,7 @@ COPY (
         height,
         level,
         geometry -- DuckDB v.1.1.0 will autoload this as a `geometry` type
-    FROM read_parquet('az://overturemapswestus2.blob.core.windows.net/release/2025-06-25.0/theme=buildings/type=building/*', filename=true, hive_partitioning=1)
+    FROM read_parquet('az://overturemapswestus2.blob.core.windows.net/release/2025-08-20.1/theme=buildings/type=building/*', filename=true, hive_partitioning=1)
     WHERE
         bbox.xmin < $extent_xmax AND bbox.xmax > $extent_xmin
         AND bbox.ymin < $extent_ymax AND bbox.ymax > $extent_ymin
@@ -126,7 +126,7 @@ COPY (
         categories.primary AS category,
         ROUND(confidence,2) AS confidence,
         geometry -- DuckDB v.1.1.0 will autoload this as a `geometry` type
-FROM read_parquet('s3://overturemaps-us-west-2/release/2025-06-25.0/theme=places/*/*', filename=true, hive_partitioning=1)
+FROM read_parquet('s3://overturemaps-us-west-2/release/2025-08-20.1/theme=places/*/*', filename=true, hive_partitioning=1)
 WHERE
     -- Point geometry doesn't require looking at both min and max:
     bbox.xmin BETWEEN $extent_xmin AND $extent_xmax
@@ -140,11 +140,11 @@ COPY (
     SELECT
         subtype,
         geometry -- DuckDB v.1.1.0 will autoload this as a `geometry` type
-    FROM read_parquet('az://overturemapswestus2.blob.core.windows.net/release/2025-06-25.0/theme=base/type=land_cover/*', filename=true, hive_partitioning=1)
+    FROM read_parquet('az://overturemapswestus2.blob.core.windows.net/release/2025-08-20.1/theme=base/type=land_cover/*', filename=true, hive_partitioning=1)
     WHERE
         bbox.xmin < $extent_xmax AND bbox.xmax > $extent_xmin
         AND bbox.ymin < $extent_ymax AND bbox.ymax > $extent_ymin
-) TO '{{data_dir}}/land_cover.geojsonseq' WITH (FORMAT GDAL, DRIVER 'GeoJSONSeq', SRS 'EPSG:4326');
+) TO '{{overture_data_dir}}/land_cover.geojsonseq' WITH (FORMAT GDAL, DRIVER 'GeoJSONSeq', SRS 'EPSG:4326');
 
 -- breakpoint
 
@@ -157,8 +157,8 @@ COPY (
         height,
         surface,
         geometry -- DuckDB v.1.1.0 will autoload this as a `geometry` type
-    FROM read_parquet('az://overturemapswestus2.blob.core.windows.net/release/2025-06-25.0/theme=base/type=infrastructure/*', filename=true, hive_partitioning=1)
+    FROM read_parquet('az://overturemapswestus2.blob.core.windows.net/release/2025-08-20.1/theme=base/type=infrastructure/*', filename=true, hive_partitioning=1)
     WHERE
         bbox.xmin < $extent_xmax AND bbox.xmax > $extent_xmin
         AND bbox.ymin < $extent_ymax AND bbox.ymax > $extent_ymin
-) TO '{{data_dir}}/infrastructure.geojsonseq' WITH (FORMAT GDAL, DRIVER 'GeoJSONSeq', SRS 'EPSG:4326');
+) TO '{{overture_data_dir}}/infrastructure.geojsonseq' WITH (FORMAT GDAL, DRIVER 'GeoJSONSeq', SRS 'EPSG:4326');
