@@ -1,7 +1,11 @@
 {
   "version": 8,
-  "glyphs": "https://fonts.openmaptiles.org/{fontstack}/{range}.pbf",
+  "glyphs": "http://localhost:3002/fonts/{fontstack}/{range}.pbf",
   "sprite": "sprites/sprite",
+  "transition": {
+    "duration": 500,
+    "delay": 0
+  },
   "sources": {
     "buildings-tiles": {
       "type": "vector",
@@ -258,11 +262,11 @@
             "heath",
             "#c7e0b2",
             "wetland",
-            "#b9e6fa50",
+            "#b9e6fa",
             "swamp",
-            "#a3def850",
+            "#a3def8",
             "marsh",
-            "#8dd7f650",
+            "#8dd7f6",
             "crop",
             "#f7eab7",
             "cropland",
@@ -311,11 +315,11 @@
             "heath",
             "#769b4a",
             "wetland",
-            "#4fc3f750",
+            "#4fc3f7",
             "swamp",
-            "#29b6f650",
+            "#29b6f6",
             "marsh",
-            "#03a9f450",
+            "#03a9f4",
             "crop",
             "#e6c76a",
             "cropland",
@@ -343,25 +347,28 @@
         "fill-outline-color": "#ffffff00"
       }
     },
-    {
-      "id": "land-cover-wetland-pattern",
+        {
+      "id": "land-cover-wetlands-fill",
       "type": "fill",
       "source": "land-cover-tiles",
       "source-layer": "land-cover",
       "filter": [
-        "==",
+        "in",
         [
           "get",
           "subtype"
         ],
-        "wetland"
+        [
+          "literal",
+          ["wetland", "swamp", "marsh"]
+        ]
       ],
-      "minzoom": 12,
+      "minzoom": 9,
       "layout": {
         "visibility": "visible"
       },
       "paint": {
-        "fill-pattern": "wetland",
+        "fill-color": "#D9E1E2",
         "fill-opacity": [
           "interpolate",
           [
@@ -373,67 +380,33 @@
           12,
           0.3,
           15,
-          0.5,
-          18,
-          0.6
+          1
         ]
       }
     },
     {
-      "id": "land-cover-swamp-pattern",
+      "id": "land-cover-wetlands-pattern",
       "type": "fill",
       "source": "land-cover-tiles",
       "source-layer": "land-cover",
       "filter": [
-        "==",
+        "in",
         [
           "get",
           "subtype"
         ],
-        "swamp"
-      ],
-      "minzoom": 12,
-      "layout": {
-        "visibility": "visible"
-      },
-      "paint": {
-        "fill-pattern": "swamp",
-        "fill-opacity": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          12,
-          0.3,
-          15,
-          0.5,
-          18,
-          0.6
+        [
+          "literal",
+          ["wetland", "swamp", "marsh"]
         ]
-      }
-    },
-    {
-      "id": "land-cover-marsh-pattern",
-      "type": "fill",
-      "source": "land-cover-tiles",
-      "source-layer": "land-cover",
-      "filter": [
-        "==",
-        [
-          "get",
-          "subtype"
-        ],
-        "marsh"
       ],
-      "minzoom": 12,
+      "minzoom": 9,
       "layout": {
         "visibility": "visible"
       },
       "paint": {
-        "fill-pattern": "marsh",
+        "fill-pattern": "speckles_blue",
+        "fill-color": "#A4DBE8",
         "fill-opacity": [
           "interpolate",
           [
@@ -445,9 +418,7 @@
           12,
           0.3,
           15,
-          0.5,
-          18,
-          0.6
+          1
         ]
       }
     },
@@ -473,7 +444,7 @@
           "tree",
           "#006400",
           "wetland",
-          "#20B2AA",
+          "#4fc3f700",
           "land",
           "#f0f0f0",
           "physical",
@@ -506,9 +477,9 @@
         "visibility": "visible"
       },
       "paint": {
-        "fill-color": "#9ADBE8",
+        "fill-color": "#A4DBE8",
         "fill-opacity": 1,
-        "fill-outline-color": "#59CBE8"
+        "fill-outline-color": "#B9D9EB"
       }
     },
     {
@@ -527,7 +498,7 @@
         "visibility": "visible"
       },
       "paint": {
-        "line-color": "#59CBE8",
+        "line-color": "#B9D9EB",
         "line-width": 1,
         "line-opacity": 1
       }
@@ -857,7 +828,7 @@
           ""
         ],
         "text-font": [
-          "Roboto Regular"
+          "TeX Gyre Termes Italic"
         ],
         "text-size": [
           "interpolate",
@@ -2003,7 +1974,7 @@
           11,
           0,
           15,
-          1
+          0.8
         ]
       }
     },
@@ -2517,94 +2488,6 @@
       }
     },
     {
-      "id": "health-zones-labels-interior",
-      "type": "symbol",
-      "source": "health-zones-centroids-tiles",
-      "source-layer": "health-zones-centroids",
-      "minzoom": 5,
-      "maxzoom": 8,
-      "layout": {
-        "visibility": "visible",
-        "text-field": [
-          "get",
-          "zonesante"
-        ],
-        "text-font": [
-          "Metropolis Bold"
-        ],
-        "text-size": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          5,
-          6,
-          8,
-          8
-        ],
-        "text-transform": "uppercase",
-        "text-letter-spacing": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          5,
-          0.1,
-          8,
-          0.25
-        ],
-        "text-max-width": 8,
-        "text-justify": "center",
-        "text-allow-overlap": false,
-        "text-ignore-placement": false,
-        "text-optional": false,
-        "text-padding": 2,
-        "text-pitch-alignment": "viewport",
-        "text-rotation-alignment": "viewport",
-        "text-offset": [
-          0,
-          0
-        ]
-      },
-      "paint": {
-        "text-color": "#53565A",
-        "text-halo-color": "#ffffff",
-        "text-halo-width": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          5,
-          0,
-          8,
-          0.8
-        ],
-        "text-opacity": [
-          "interpolate",
-          [
-            "exponential",
-            2
-          ],
-          [
-            "zoom"
-          ],
-          5,
-          0,
-          6,
-          1
-        ]
-      }
-    },
-    {
       "id": "health-zones-labels-exterior",
       "type": "symbol",
       "source": "health-zones-tiles",
@@ -2621,7 +2504,7 @@
           ]
         ],
         "text-font": [
-          "Metropolis Bold"
+          "TeX Gyre Termes Bold"
         ],
         "text-size": [
           "interpolate",
@@ -2726,13 +2609,104 @@
         ]
       }
     },
+        {
+      "id": "health-zones-labels-interior",
+      "type": "symbol",
+      "source": "health-zones-centroids-tiles",
+      "source-layer": "health-zones-centroids",
+      "minzoom": 5,
+      "maxzoom": 12,
+      "layout": {
+        "visibility": "visible",
+        "text-field": [
+          "get",
+          "zonesante"
+        ],
+        "text-font": [
+          "TeX Gyre Termes Bold"
+        ],
+        "text-size": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          5,
+          6,
+          8,
+          12,
+          13,
+          24
+        ],
+        "text-transform": "uppercase",
+        "text-letter-spacing": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          5,
+          0.1,
+          9,
+          0.2,
+          14,
+          2
+        ],
+        "text-max-width": 12,
+        "text-justify": "center",
+        "text-allow-overlap": false,
+        "text-ignore-placement": false,
+        "text-optional": false,
+        "text-padding": 1,
+        "text-pitch-alignment": "viewport",
+        "text-rotation-alignment": "viewport",
+        "text-offset": [
+          0,
+          0
+        ]
+      },
+      "paint": {
+        "text-color": "#53565A",
+        "text-halo-color": "#ffffff",
+        "text-halo-width": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          5,
+          0,
+          8,
+          0.8
+        ],
+        "text-opacity": [
+          "interpolate",
+          [
+            "exponential",
+            2
+          ],
+          [
+            "zoom"
+          ],
+          5,
+          0,
+          6,
+          1
+        ]
+      }
+    },
     {
       "id": "health-areas-labels-interior",
       "type": "symbol",
       "source": "health-areas-centroids-tiles",
       "source-layer": "health-areas-centroids",
       "minzoom": 7.5,
-      "maxzoom": 13,
       "layout": {
         "visibility": "visible",
         "text-field": [
@@ -2740,7 +2714,7 @@
           "airesante"
         ],
         "text-font": [
-          "Open Sans Semibold"
+          "TeX Gyre Termes Italic"
         ],
         "text-size": [
           "interpolate",
@@ -2752,8 +2726,10 @@
           ],
           7,
           5,
-          11,
-          10
+          12,
+          8,
+          14,
+          24
         ],
         "text-transform": "uppercase",
         "text-letter-spacing": [
@@ -2766,8 +2742,10 @@
           ],
           7.5,
           0.1,
-          12,
-          0.25
+          13,
+          1,
+          14,
+          2
         ],
         "text-max-width": 8,
         "text-justify": "center",
@@ -2810,9 +2788,7 @@
           7.5,
           0,
           8,
-          1,
-          13,
-          0
+          1
         ]
       }
     },
@@ -2833,7 +2809,7 @@
           ]
         ],
         "text-font": [
-          "Open Sans Semibold"
+          "TeX Gyre Termes Regular"
         ],
         "text-size": [
           "interpolate",
@@ -2997,7 +2973,7 @@
           "Health Facility"
         ],
         "text-font": [
-          "Metropolis Medium"
+          "TeX Gyre Heros Regular"
         ],
         "text-size": [
           "interpolate",
@@ -3053,7 +3029,7 @@
           "localite"
         ],
         "text-font": [
-          "Metropolis Medium"
+          "TeX Gyre Heros Regular"
         ],
         "text-size": [
           "interpolate",
@@ -3073,7 +3049,7 @@
         "text-transform": "none",
         "text-allow-overlap": false,
         "text-ignore-placement": false,
-        "text-padding": 3,
+        "text-padding": 2,
         "text-max-width": 8
       },
       "paint": {
@@ -3086,23 +3062,16 @@
           [
             "zoom"
           ],
-          12,
+          13.85,
           "#3F4444",
           14,
           "#fff"
         ],
         "text-opacity": [
-          "interpolate",
-          [
-            "exponential",
-            1.5
-          ],
-          [
-            "zoom"
-          ],
-          10,
+          "step",
+          ["zoom"],
           0,
-          10.5,
+          10,
           1
         ],
         "text-halo-color": [
@@ -3114,9 +3083,9 @@
           [
             "zoom"
           ],
-          10,
-          "#000",
-          13,
+          13.85,
+          "#D0D3D4",
+          14,
           "#3F4444"
         ],
         "text-halo-width": [
@@ -3128,12 +3097,12 @@
           [
             "zoom"
           ],
-          12,
-          0.1,
-          13.5,
-          0.5,
-          16,
-          1.2
+          12.5,
+          0,
+          13,
+          0.4,
+          15,
+          1.8
         ]
       }
     }

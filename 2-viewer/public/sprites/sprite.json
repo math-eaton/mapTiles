@@ -1,22 +1,22 @@
 {
-  "wetland": {
-    "width": 32,
-    "height": 32,
+  "speckles_green": {
+    "width": 64,
+    "height": 64,
     "x": 0,
     "y": 0,
     "pixelRatio": 1
   },
-  "swamp": {
-    "width": 32,
-    "height": 32,
-    "x": 32,
+  "speckles_blue": {
+    "width": 64,
+    "height": 64,
+    "x": 64,
     "y": 0,
     "pixelRatio": 1
   },
-  "marsh": {
-    "width": 32,
-    "height": 32,
-    "x": 64,
+  "speckles_yellow": {
+    "width": 64,
+    "height": 64,
+    "x": 128,
     "y": 0,
     "pixelRatio": 1
   }

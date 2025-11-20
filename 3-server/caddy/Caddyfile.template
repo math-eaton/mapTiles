@@ -11,6 +11,31 @@
         respond "OK" 200
     }
 
+    # Serve MapLibre fonts
+    handle /fonts/* {
+        # Enable CORS for font requests
+        @cors_preflight {
+            method OPTIONS
+        }
+        
+        header {
+            Access-Control-Allow-Origin *
+            Access-Control-Allow-Methods "GET, HEAD, OPTIONS"
+            Access-Control-Allow-Headers "Range, Content-Type"
+            Access-Control-Expose-Headers "Content-Length, Content-Range, Accept-Ranges"
+            Content-Type "application/x-protobuf"
+            Cache-Control "public, max-age=31536000, immutable"
+        }
+
+        # Strip /fonts prefix and serve from /fonts
+        uri strip_prefix /fonts
+        
+        # Serve font PBF files
+        file_server {
+            root /fonts
+        }
+    }
+
     # Serve static PMTiles files
     handle /static/* {
         # Enable CORS for map tile requests
@@ -79,7 +104,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>MapTiles Server</title>
+    <title>map tiles</title>
     <style>
         body { font-family: sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
         h1 { color: #333; }
@@ -89,8 +114,13 @@
     </style>
 </head>
 <body>
-    <h1>🗺️ MapTiles Server</h1>
-    <p>Hybrid tile server for static PMTiles and dynamic PostGIS layers</p>
+    <h1>tiles here</h1>
+    
+    <div class="endpoint">
+        <h2>MapLibre Fonts</h2>
+        <p>Custom font glyphs for map labels</p>
+        <pre>http://localhost:8080/fonts/{fontstack}/{range}.pbf</pre>
+    </div>
     
     <div class="endpoint">
         <h2>Static PMTiles (Basemap)</h2>

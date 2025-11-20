@@ -78,6 +78,7 @@ class OvertureMap {
             'water-lines-casing': 38,   // linear feature bg
             'water-lines': 39,           // Rivers, streams, canals
             'water-polygons': 40,        // Water body fills
+            'water-texture': 49,         // Water texture overlay
             'water-polygon-outlines': 41, // Water body outlines
             
             // Contour lines (50-59)
@@ -329,59 +330,6 @@ class OvertureMap {
         }
     }
     
-    // /**
-    //  * Add warning about GitHub Pages limitations
-    //  */
-    // addGitHubPagesWarning() {
-    //     console.warn('⚠️  PMTiles on GitHub Pages Notice:');
-    //     console.warn('GitHub Pages may not properly support HTTP range requests required by PMTiles.');
-    //     console.warn('For better performance, consider hosting tiles on:');
-    //     console.warn('• Protomaps Cloud (free tier available)');
-    //     console.warn('• Cloudflare R2 or AWS S3');
-    //     console.warn('• Converting to traditional vector tile directories');
-    //     console.warn('See DEPLOYMENT_OPTIONS.md for details.');
-    // }
-    
-    /**
-     * Show user-friendly error message for PMTiles issues
-     */
-    // showPMTilesError() {
-    //     const mapContainer = document.getElementById(this.containerId);
-    //     const errorOverlay = document.createElement('div');
-    //     errorOverlay.style.cssText = `
-    //         position: absolute;
-    //         top: 10px;
-    //         left: 10px;
-    //         right: 10px;
-    //         background: rgba(231, 76, 60, 0.95);
-    //         color: white;
-    //         padding: 15px;
-    //         border-radius: 5px;
-    //         font-family: sans-serif;
-    //         font-size: 14px;
-    //         z-index: 10000;
-    //         box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-    //     `;
-    //     errorOverlay.innerHTML = `
-    //         <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-    //             <div>
-    //                 <strong>⚠️ Tile Loading Issue</strong><br>
-    //                 GitHub Pages doesn't fully support the byte-serving required by PMTiles.<br>
-    //                 <small>Consider hosting tiles on a CDN for better reliability.</small>
-    //             </div>
-    //             <button onclick="this.parentElement.parentElement.remove()" style="background: none; border: none; color: white; font-size: 18px; cursor: pointer; padding: 0 5px;">×</button>
-    //         </div>
-    //     `;
-    //     mapContainer.appendChild(errorOverlay);
-        
-    //     // Auto-remove after 10 seconds
-    //     setTimeout(() => {
-    //         if (errorOverlay.parentElement) {
-    //             errorOverlay.remove();
-    //         }
-    //     }, 10000);
-    // }
-    
     /**
      * Create the MapLibre map instance
      */
@@ -462,19 +410,6 @@ class OvertureMap {
         // Map load event
         this.map.on('load', async () => {
             console.log('Map loaded successfully!');
-            
-            // Load and add pattern images
-            try {
-                const specklesImage = await this.map.loadImage('/sprites/processing/speckles-1.png');
-                this.map.addImage('speckles-1', specklesImage.data);
-                console.log('Pattern image loaded: speckles-1');
-                
-                // Apply pattern to water polygons after image is loaded
-                this.map.setPaintProperty('water-polygons', 'fill-pattern', 'speckles-1');
-                console.log('Applied speckles-1 pattern to water-polygons layer');
-            } catch (error) {
-                console.error('Failed to load pattern image:', error);
-            }
             
             // console.log('Available sources:', Object.keys(this.map.getStyle().sources));
             

@@ -35,7 +35,6 @@ LAYER_SETTINGS = {
         '--drop-densest-as-needed',
         '--extend-zooms-if-still-dropping-maximum=15',
         '--minimum-zoom=11',
-        '--buffer=12'
     ],
 
     # Infrastructure polygons
@@ -73,7 +72,6 @@ LAYER_SETTINGS = {
         # '--full-detail=14',  # Increased from 12 for better detail at mid-zooms
         '--minimum-detail=11',  # Increased from 10
         # '--no-duplication',
-        '--buffer=0',
         '--hilbert',
         '--coalesce-densest-as-needed',
         '--drop-densest-as-needed',
@@ -88,9 +86,6 @@ LAYER_SETTINGS = {
         '--coalesce-densest-as-needed',
         '--drop-densest-as-needed',
         '--extend-zooms-if-still-dropping-maximum=13',
-        # '--minimum-zoom=7',  # Increased from 8
-        # '--maximum-zoom=15',  
-        # '--maximum-tile-bytes=2097152' 
     ],
 
     'land.fgb': [
@@ -108,7 +103,6 @@ LAYER_SETTINGS = {
     # Roads - linear features with line-specific optimizations
     'roads.fgb': [
         '--no-line-simplification',
-        '--buffer=16',
         # '--drop-rate=0.15',
         # '--drop-smallest',
         '--simplification=1', 
@@ -130,7 +124,6 @@ LAYER_SETTINGS = {
         # '--drop-rate=0.15', 
         '--extend-zooms-if-still-dropping-maximum=15',
         # '--no-clipping',
-        '--buffer=16',
         '--hilbert',
         '--drop-densest-as-needed',
         '--no-simplification-of-shared-nodes',
@@ -168,7 +161,6 @@ LAYER_SETTINGS = {
         '--coalesce-densest-as-needed',  # Merge features when needed, maintaining coverage
         '--extend-zooms-if-still-dropping-maximum=16',
         '--no-tiny-polygon-reduction',
-        '--buffer=8'  # Standard buffer for proper rendering
     ],
 
 
@@ -184,7 +176,6 @@ LAYER_SETTINGS = {
         '--coalesce-densest-as-needed',  # Merge features when needed, maintaining coverage
         '--extend-zooms-if-still-dropping-maximum=16',
         '--no-tiny-polygon-reduction',
-        '--buffer=8'
     ],
 
     # Health zone centroids - point labels for interior placement
@@ -195,7 +186,6 @@ LAYER_SETTINGS = {
         '--maximum-zoom=16',
         '--no-feature-limit',  # Ensure all centroid points are included
         '--no-tile-size-limit',  # Small point layer, allow all features
-        '--buffer=64'  # Large buffer to prevent label clipping at tile edges
     ],
 
     # Health area centroids - point labels for interior placement  
@@ -206,7 +196,6 @@ LAYER_SETTINGS = {
         '--maximum-zoom=16',
         '--no-feature-limit',  # Ensure all centroid points are included
         '--no-tile-size-limit',  # Small point layer, allow all features
-        '--buffer=64'  # Large buffer to prevent label clipping at tile edges
     ],
 
     # Water centerlines - linear features for labeling elongated water bodies
@@ -236,7 +225,6 @@ LAYER_SETTINGS = {
         '--drop-smallest-as-needed',  # Drop smallest when tiles too large
         '--gamma=1.4',  # Reduce density of clustered settlements
         '--extend-zooms-if-still-dropping-maximum=14',
-        '--buffer=12',
         ],
 
     # Administrative boundaries - provinces (top-level admin units)
@@ -252,14 +240,13 @@ LAYER_SETTINGS = {
         '--extend-zooms-if-still-dropping',
         # '--maximum-zoom=12',
         # '--minimum-zoom=3',  # Visible from very low zoom levels
-        '--buffer=8'
     ],
     
 }
 
 # Base tippecanoe command flags that apply to all layers
 BASE_COMMAND = [
-    '--buffer=8',
+    # '--buffer=8',
     '-zg',
     '-Bg',
     '--drop-smallest',

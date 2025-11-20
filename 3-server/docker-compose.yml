@@ -115,6 +115,8 @@ services:
       # Mount PMTiles directly from processing output
       # Using ../data relative to 3-server directory to reach repo root
       - ../data/3-pmtiles:/tiles:ro
+      # Mount MapLibre fonts from viewer
+      - ../2-viewer/public/fonts:/fonts:ro
       # Caddy data for certificates
       - caddy_data:/data
       - caddy_config:/config
