@@ -2541,19 +2541,7 @@
         "text-allow-overlap": false,
         "text-ignore-placement": false,
         "text-optional": false,
-        "text-padding": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          8,
-          0,
-          15,
-          30
-        ],
+        "text-padding": 0,
         "symbol-avoid-edges": false,
         "text-pitch-alignment": "viewport",
         "text-rotation-alignment": "map",
@@ -2846,7 +2834,7 @@
         "text-allow-overlap": false,
         "text-ignore-placement": false,
         "text-optional": false,
-        "text-padding": 150,
+        "text-padding": 50,
         "symbol-avoid-edges": false,
         "text-pitch-alignment": "viewport",
         "text-rotation-alignment": "map",
