@@ -2825,8 +2825,10 @@
           ],
           10,
           0.2,
-          15,
-          0.1
+          12,
+          0.3,
+          14,
+          0.8
         ],
         "symbol-placement": "line",
         "text-max-width": 24,
