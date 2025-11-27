@@ -368,21 +368,9 @@
         "visibility": "visible"
       },
       "paint": {
-        "fill-color": "#D9E1E2",
-        "fill-opacity": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          12,
-          0.3,
-          15,
-          1
-        ]
-      }
+        "fill-color": "#c5e0dc",
+          "fill-opacity": 1
+        }
     },
     {
       "id": "land-cover-wetlands-pattern",
@@ -405,21 +393,8 @@
         "visibility": "visible"
       },
       "paint": {
-        "fill-pattern": "speckles_blue",
-        "fill-color": "#A4DBE8",
-        "fill-opacity": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          12,
-          0.3,
-          15,
-          1
-        ]
+        "fill-pattern": "speckles_grey",
+        "fill-opacity": 1
       }
     },
     {
@@ -478,8 +453,7 @@
       },
       "paint": {
         "fill-color": "#A4DBE8",
-        "fill-opacity": 1,
-        "fill-outline-color": "#B9D9EB"
+        "fill-opacity": 1
       }
     },
     {
@@ -498,7 +472,7 @@
         "visibility": "visible"
       },
       "paint": {
-        "line-color": "#B9D9EB",
+        "line-color": "#9ADBE8",
         "line-width": 1,
         "line-opacity": 1
       }
@@ -1943,7 +1917,7 @@
       "source-layer": "buildings",
       "minzoom": 12,
       "layout": {
-        "visibility": "visible"
+        "visibility": "none"
       },
       "paint": {
         "fill-color": [
@@ -1976,6 +1950,80 @@
           15,
           0.8
         ]
+      }
+    },
+    {
+      "id": "buildings-flat",
+      "type": "fill",
+      "source": "buildings-tiles",
+      "source-layer": "buildings",
+      "minzoom": 11,
+      "maxzoom": 14,
+      "layout": {
+        "visibility": "visible"
+      },
+      "paint": {
+        "fill-color": [
+          "interpolate",
+          [
+            "exponential",
+            2
+          ],
+          [
+            "zoom"
+          ],
+          11,
+          "#f2bdfc",
+          14,
+          "#a93e89"
+        ],
+        "fill-opacity": [
+          "interpolate",
+          [
+            "exponential",
+            1.5
+          ],
+          [
+            "zoom"
+          ],
+          11,
+          0,
+          14,
+          0.8
+        ]
+      }
+    },
+    {
+      "id": "buildings-extrusion",
+      "type": "fill-extrusion",
+      "source": "buildings-tiles",
+      "source-layer": "buildings",
+      "minzoom": 14,
+      "layout": {
+        "visibility": "visible"
+      },
+      "paint": {
+        "fill-extrusion-color": [
+          "interpolate",
+          [
+            "exponential",
+            2
+          ],
+          [
+            "zoom"
+          ],
+          14,
+          "#a93e89",
+          16,
+          "#BFB8AF"
+        ],
+        "fill-extrusion-height": [
+          "coalesce",
+          ["get", "height"],
+          4
+        ],
+        "fill-extrusion-base": 0,
+        "fill-extrusion-opacity": 0.8
       }
     },
     {
@@ -2360,6 +2408,7 @@
           15,
           "#FF9E1B"
         ],
+        
         "line-width": [
           "interpolate",
           [
@@ -2556,8 +2605,8 @@
           ],
           8,
           50,
-          15,
-          500
+          14,
+          250
         ],
         "text-offset": [
           0,
@@ -2641,15 +2690,31 @@
           0.1,
           9,
           0.2,
+          11,
+          1.5,
           14,
-          2
+          3
         ],
-        "text-max-width": 12,
+        "text-max-width":  [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          8,
+          8,
+          11,
+          36,
+          14,
+          48
+        ],
         "text-justify": "center",
         "text-allow-overlap": false,
         "text-ignore-placement": false,
         "text-optional": false,
-        "text-padding": 1,
+        "text-padding": 0,
         "text-pitch-alignment": "viewport",
         "text-rotation-alignment": "viewport",
         "text-offset": [
@@ -2713,11 +2778,11 @@
             "zoom"
           ],
           7,
-          5,
+          4,
           12,
-          8,
+          12,
           14,
-          24
+          18
         ],
         "text-transform": "uppercase",
         "text-letter-spacing": [

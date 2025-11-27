@@ -108,7 +108,7 @@ LAYER_SETTINGS = {
         '--simplification=1', 
         # '--minimum-detail=5',  # Added to ensure minimum detail level
         '--no-simplification-of-shared-nodes',
-        '--no-clipping',
+        # '--no-clipping',
         '--extend-zooms-if-still-dropping-maximum=15',
         '--coalesce-smallest-as-needed',
         # '--maximum-tile-bytes=4194304',  # Increased limit to 4MB for road density
@@ -118,18 +118,19 @@ LAYER_SETTINGS = {
 
     # Water polygons - enhanced detail at zoom 13+
     'water.fgb': [
-        '--no-polygon-splitting',
+        # '--no-polygon-splitting',
         '--detect-shared-borders',
         '--simplification=1', 
         # '--drop-rate=0.15', 
-        '--extend-zooms-if-still-dropping-maximum=15',
+        # '--extend-zooms-if-still-dropping-maximum=15',
         # '--no-clipping',
         '--hilbert',
         '--drop-densest-as-needed',
         '--no-simplification-of-shared-nodes',
         # '--maximum-tile-bytes=4194304',
         # '--minimum-zoom=7',
-        # '--maximum-zoom=13',
+        '--buffer=8',
+        '--maximum-zoom=13',
         # '-j', '{"*":["all",["any",[">=","$zoom",12],["!=","class","stream"]],["any",[">=","$zoom",10],["==","$type","Polygon"]]]}',  # Any streams below zoom 12, only polygons below zoom 10
     ],
 

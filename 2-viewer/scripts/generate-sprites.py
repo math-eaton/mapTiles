@@ -48,8 +48,8 @@ def generate_sprites():
         suffix = config['suffix']
         
         # Sprite dimensions
-        sprite_width = 32
-        sprite_height = 32
+        sprite_width = 64
+        sprite_height = 64
         total_width = sprite_width * scale * len(svg_files)
         total_height = sprite_height * scale
         

@@ -29,6 +29,13 @@ cat > sprite.json << 'EOF'
     "x": 128,
     "y": 0,
     "pixelRatio": 1
+  },
+    "speckles_grey": {
+    "width": 64,
+    "height": 64,
+    "x": 128,
+    "y": 0,
+    "pixelRatio": 1
   }
 }
 EOF

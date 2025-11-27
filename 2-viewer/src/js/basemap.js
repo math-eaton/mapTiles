@@ -36,7 +36,7 @@ class OvertureMap {
             center: null,
             zoom: 8,
             minZoom: 7,
-            maxZoom: 15.5,
+            maxZoom: 16,
             showTileBoundaries: false,
             clampToBounds: false,
             useVectorTiles: false, // Set to true to use traditional vector tiles instead of PMTiles
@@ -76,6 +76,8 @@ class OvertureMap {
 
             // Water features (40-49)
             'water-lines-casing': 38,   // linear feature bg
+            'land-cover-wetlands-fill': 37,
+            'land-cover-wetlands-pattern': 37, // Wetlands pattern fill
             'water-lines': 39,           // Rivers, streams, canals
             'water-polygons': 40,        // Water body fills
             'water-texture': 49,         // Water texture overlay
@@ -98,9 +100,6 @@ class OvertureMap {
             
             // Buildings and structures (80-89)
             'buildings': 80,           // Building fills
-            // 'buildings-low-lod': 82,   // Building fills (low detail)
-            // 'buildings-medium-lod': 81, // Building fills (medium detail)
-            // 'buildings-high-lod': 80,  // Building fills (high detail)
             'building-outlines': 83,   // Building outlines
 
             // Administrative boundaries (85-89)
@@ -209,7 +208,7 @@ class OvertureMap {
             // Only update zoom levels from tilejson if not explicitly set in options
             // Check if values are still defaults (not overridden by user)
             const defaultMinZoom = 7;
-            const defaultMaxZoom = 15.5;
+            const defaultMaxZoom = 16;
             
             if (this.tileMetadata.minzoom !== undefined && this.options.minZoom === defaultMinZoom) {
                 this.options.minZoom = this.tileMetadata.minzoom;
@@ -768,6 +767,8 @@ class OvertureMap {
                     multiplier: 3.28084,
                     thresholds: {
                         // zoom: [minor, major] contour intervals in feet
+                        9: [300, 600],
+                        10: [150, 600],
                         11: [100, 400],
                         12: [50, 200],
                         13: [50, 200],
@@ -791,18 +792,19 @@ class OvertureMap {
             paint: {
             "hillshade-exaggeration": [
                 "interpolate",
-                ["linear"],
+                ["exponential", 1.5],
                 ["zoom"],
-                6, 0.5,
-                14, 0.15
+                6, 0.75,
+                11, 0.4,
+                15, 0.15
             ],
             "hillshade-shadow-color": [
                 "interpolate",
                 ["linear"],
                 ["zoom"],
-                0, "rgba(0,0,0,0.35)",
-                11, "rgba(0,0,0,0.15)",
-                16, "rgba(123, 123, 123, 0.1)"
+                6, "rgba(0,0,0,0.2)",
+                11, "rgba(0,0,0,0.05)",
+                15, "rgba(123, 123, 123, 0)"
             ],
             "hillshade-highlight-color": [
                 "interpolate",
@@ -823,17 +825,17 @@ class OvertureMap {
             source: "contours",
             "source-layer": "contours",
             paint: {
-            "line-color": "rgba(139, 69, 19, 0.4)",  // Neutral brown
+            "line-color": "rgba(139, 69, 19, 0.5)",  // Neutral brown
             "line-width": [
                 "interpolate",
                 ["linear"],
                 ["zoom"],
-                8, [
+                6, [
                 "case",
                 ["==", ["get", "level"], 1], 0.15,  // Major contours
-                0.07                                 // Minor contours
+                0.1                                 // Minor contours
                 ],
-                10.5, [
+                9, [
                 "case", 
                 ["==", ["get", "level"], 1], 0.35,  // Major contours
                 0.2                               // Minor contours
@@ -844,13 +846,13 @@ class OvertureMap {
                 0.3                              // Minor contours
                 ]
             ],
-            // Ramp opacity from 0 at zoom 11 to 1 at zoom 15
+            // Ramp opacity from X at zoom 11 to 1 at zoom 15
             "line-opacity": [
                 "interpolate",
                 ["exponential", 1.5],
                 ["zoom"],
-                10, 0.25,
-                13, 1
+                11, 0.5,
+                12, 1
             ]
             },
             layout: {
