@@ -17,6 +17,16 @@ from .generateLabels import (
     batch_generate_centerlines
 )
 
+# Optional performance optimization imports
+try:
+    from . import polars_helpers
+    from . import xgboost_optimizer
+    POLARS_HELPERS_AVAILABLE = True
+    XGBOOST_OPTIMIZER_AVAILABLE = True
+except ImportError:
+    POLARS_HELPERS_AVAILABLE = False
+    XGBOOST_OPTIMIZER_AVAILABLE = False
+
 __all__ = [
     'download_overture_data',
     'convert_file',
@@ -31,3 +41,9 @@ __all__ = [
     'generate_centerlines',
     'batch_generate_centerlines',
 ]
+
+# Add optional modules to __all__ if available
+if POLARS_HELPERS_AVAILABLE:
+    __all__.append('polars_helpers')
+if XGBOOST_OPTIMIZER_AVAILABLE:
+    __all__.append('xgboost_optimizer')
