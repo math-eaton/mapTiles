@@ -26,7 +26,8 @@ def convert_parquet_to_fgb(
     input_path: Union[str, Path],
     output_path: Optional[Union[str, Path]] = None,
     overwrite: bool = False,
-    verbose: bool = True
+    verbose: bool = True,
+    cleanup_source: bool = False
 ) -> Tuple[bool, str, Optional[Path]]:
     """
     Convert a single GeoParquet file to FlatGeobuf format.
@@ -36,6 +37,7 @@ def convert_parquet_to_fgb(
         output_path: Path to output .fgb file (auto-generated if None)
         overwrite: Whether to overwrite existing files
         verbose: Print progress information
+        cleanup_source: Remove source file after successful conversion (saves disk space)
         
     Returns:
         Tuple of (success, message, output_path)
@@ -81,6 +83,12 @@ def convert_parquet_to_fgb(
         if verbose:
             print(f"✓ {len(gdf):,} features ({output_size_mb:.1f} MB, {compression_pct:+.0f}%)")
         
+        # Remove source file if requested (saves disk space)
+        if cleanup_source and input_path.exists():
+            input_path.unlink()
+            if verbose:
+                print(f"  → Removed source file: {input_path.name} (saved {input_size_mb:.1f} MB)")
+        
         return True, f"Converted {len(gdf)} features", output_path
         
     except Exception as e:
@@ -95,7 +103,8 @@ def batch_convert_directory(
     pattern: str = "*.parquet",
     overwrite: bool = False,
     verbose: bool = True,
-    parallel: bool = False
+    parallel: bool = False,
+    cleanup_source: bool = False
 ) -> dict:
     """
     Convert all GeoParquet files in a directory to FlatGeobuf format.
@@ -107,6 +116,7 @@ def batch_convert_directory(
         overwrite: Whether to overwrite existing files
         verbose: Print progress information
         parallel: Use parallel processing (experimental)
+        cleanup_source: Remove source files after successful conversion (saves disk space)
         
     Returns:
         Dictionary with conversion results
@@ -143,7 +153,8 @@ def batch_convert_directory(
         "converted": 0,
         "skipped": 0,
         "errors": [],
-        "output_files": []
+        "output_files": [],
+        "cleaned_up": 0 if cleanup_source else None
     }
     
     # Process files
@@ -157,7 +168,8 @@ def batch_convert_directory(
             input_path=parquet_file,
             output_path=output_file,
             overwrite=overwrite,
-            verbose=False  # Suppress individual messages when batch processing
+            verbose=False,  # Suppress individual messages when batch processing
+            cleanup_source=cleanup_source
         )
         
         if success:
@@ -166,6 +178,8 @@ def batch_convert_directory(
             else:
                 results["converted"] += 1
                 results["output_files"].append(output_path)
+                if cleanup_source:
+                    results["cleaned_up"] += 1
                 
                 if verbose and not use_tqdm:  # Only print if not using tqdm
                     print(f"✓ {parquet_file.name} → {output_file.name}")
@@ -187,6 +201,8 @@ def batch_convert_directory(
         print(f"  Converted:       {results['converted']}")
         print(f"  Skipped:         {results['skipped']}")
         print(f"  Errors:          {len(results['errors'])}")
+        if cleanup_source:
+            print(f"  Cleaned up:      {results['cleaned_up']} source files removed")
         
         if results['output_files']:
             total_size_mb = sum(f.stat().st_size for f in results['output_files']) / 1024 / 1024
@@ -231,6 +247,11 @@ def main():
         action="store_true",
         help="Suppress progress output"
     )
+    parser.add_argument(
+        "--cleanup",
+        action="store_true",
+        help="Remove source files after successful conversion (saves disk space)"
+    )
     
     args = parser.parse_args()
     
@@ -239,7 +260,8 @@ def main():
         output_dir=args.output_dir,
         pattern=args.pattern,
         overwrite=args.overwrite,
-        verbose=not args.quiet
+        verbose=not args.quiet,
+        cleanup_source=args.cleanup
     )
     
     sys.exit(0 if results["success"] else 1)

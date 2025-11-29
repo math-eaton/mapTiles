@@ -50,6 +50,7 @@ class OvertureMap {
         this.protocol = null;
         
         // Layer draw order index - lower numbers draw first (bottom), higher numbers draw on top
+        // This order also determines label priority: higher z-order = higher label placement priority
         this.layerDrawOrder = {
             // Base layers (0-9)
             'background': 1,
@@ -91,7 +92,7 @@ class OvertureMap {
             // Transportation (60-79)
             'roads-solid': 60,    // Major road lines (solid)
             'roads-dashed': 61,   // Minor road lines (dashed)
-            'roads-solid-background': 59, // Background for solid roads (for better contrast)
+            'roads-solid-casing': 59, // Background for solid roads (for better contrast)
 
             // Infrastructure (70-79)
             'infrastructure-polygons': 70,  // Infrastructure polygon fills
@@ -99,7 +100,8 @@ class OvertureMap {
             'infrastructure-points': 72,    // Infrastructure points (towers, utilities, etc.)
             
             // Buildings and structures (80-89)
-            'buildings': 80,           // Building fills
+            'buildings-flat': 80,           // Building fills
+            'buildings-extrusion': 79,    // 3D building extrusions
             'building-outlines': 83,   // Building outlines
 
             // Administrative boundaries (85-89)
@@ -120,6 +122,29 @@ class OvertureMap {
             'health-facilities-labels': 101, // Health facility labels
             'settlement-names': 102,   // Settlement name labels - highest priority
             'placenames': 103         // Other place names
+        };
+        
+        // Label priority weightings for symbol-sort-key
+        // In MapLibre, LOWER symbol-sort-key values = HIGHER priority (drawn first, gets preference)
+        // We invert the layerDrawOrder so higher z-order = higher label priority
+        this.labelPriority = {
+            // Contour labels (lowest priority)
+            'contour-text': 1000 - 51,
+            
+            // Administrative boundary labels
+            'health-areas-labels-interior': 1000 - 80,
+            'health-areas-labels-exterior': 1000 - 75,
+            'health-zones-labels-interior': 1000 - 90,
+            'health-zones-labels-exterior': 1000 - 85,
+            
+            // Place labels
+            'place-labels': 1000 - 100,
+            
+            // Health facility labels
+            'health-facilities-labels': 1000 - 101,
+            
+            // Settlement labels (highest priority)
+            'settlement-names-labels': 1000 - 50,
         };
         
         this.init();
@@ -443,6 +468,9 @@ class OvertureMap {
                 console.log('Camera bounds set to:', this.options.bounds);
                 this.map.setMaxBounds(this.options.bounds);
             }
+            
+            // Apply label priorities to ensure proper text hierarchy
+            this.applyLabelPriorities();
             
             // Debug: Force layer visibility after load
             // setTimeout(() => {
@@ -968,6 +996,52 @@ class OvertureMap {
     }
     
     /**
+     * Apply label priority weightings to symbol layers
+     * This ensures higher z-order labels get placement priority when overlapping
+     * In MapLibre, lower symbol-sort-key values = higher priority (drawn first)
+     */
+    applyLabelPriorities() {
+        if (!this.map) {
+            console.warn('Map not initialized, cannot apply label priorities');
+            return;
+        }
+        
+        let appliedCount = 0;
+        
+        // Iterate through all label layers and apply symbol-sort-key
+        for (const [layerId, priority] of Object.entries(this.labelPriority)) {
+            const layer = this.map.getLayer(layerId);
+            
+            if (layer && layer.type === 'symbol') {
+                try {
+                    // Set symbol-sort-key in the layout properties
+                    this.map.setLayoutProperty(layerId, 'symbol-sort-key', priority);
+                    appliedCount++;
+                    console.log(`Applied label priority ${priority} to layer: ${layerId}`);
+                } catch (error) {
+                    console.warn(`Failed to apply label priority to ${layerId}:`, error);
+                }
+            }
+        }
+        
+        console.log(`Label priorities applied to ${appliedCount} layers`);
+        
+        // Log the priority hierarchy for verification
+        if (appliedCount > 0) {
+            const sortedPriorities = Object.entries(this.labelPriority)
+                .sort((a, b) => a[1] - b[1]); // Sort by priority (low = high priority)
+            
+            console.log('Label priority hierarchy (highest to lowest):');
+            console.table(sortedPriorities.map(([id, priority]) => ({
+                'Layer ID': id,
+                'Symbol Sort Key': priority,
+                'Z-Order': 1000 - priority,
+                'Priority': priority < 900 ? 'HIGH' : priority < 950 ? 'MEDIUM' : 'LOW'
+            })));
+        }
+    }
+    
+    /**
      * Toggle layer visibility
      */
     toggleLayer(layerId, visible = null) {
@@ -1198,6 +1272,41 @@ class OvertureMap {
             'Draw Order': this.layerDrawOrder[layer.id] || 'unspecified',
             Type: layer.type
         })));
+    }
+    
+    /**
+     * Get the current label priority configuration
+     * @returns {Object} - The label priority index
+     */
+    getLabelPriorities() {
+        return { ...this.labelPriority };
+    }
+    
+    /**
+     * Print current label priorities to console (for debugging)
+     */
+    printLabelPriorities() {
+        if (!this.map) {
+            console.log('Map not initialized');
+            return;
+        }
+        
+        const sortedPriorities = Object.entries(this.labelPriority)
+            .sort((a, b) => a[1] - b[1]); // Sort by priority (low = high priority)
+        
+        console.log('Label priorities (lower value = higher priority):');
+        console.table(sortedPriorities.map(([layerId, priority]) => {
+            const layer = this.map.getLayer(layerId);
+            const currentSortKey = layer ? this.map.getLayoutProperty(layerId, 'symbol-sort-key') : 'N/A';
+            
+            return {
+                'Layer ID': layerId,
+                'Priority Value': priority,
+                'Z-Order': 1000 - priority,
+                'Current Sort Key': currentSortKey,
+                'Status': layer ? 'Active' : 'Not Found'
+            };
+        }));
     }
     
     /**

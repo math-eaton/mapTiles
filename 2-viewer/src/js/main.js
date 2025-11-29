@@ -49,7 +49,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.toggleContours = (visible) => overtureMap.toggleContours(visible);
         window.toggleHillshade = (visible) => overtureMap.toggleHillshade(visible);
         
+        // Add label priority debugging methods to global scope
+        window.printLabelPriorities = () => overtureMap.printLabelPriorities();
+        window.getLabelPriorities = () => overtureMap.getLabelPriorities();
+        window.printLayerOrder = () => overtureMap.printLayerOrder();
+        
         console.log('Overture map initialization complete');
+        console.log('💡 Debug commands available:');
+        console.log('  - printLabelPriorities() - Show label priority hierarchy');
+        console.log('  - getLabelPriorities() - Get label priority configuration');
+        console.log('  - printLayerOrder() - Show current layer stack');
         
         // Ensure the legend is populated after the map is initialized
         const legendContainer = document.getElementById('map-legend');

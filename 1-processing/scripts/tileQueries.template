@@ -7,17 +7,25 @@ SET s3_region='us-west-2';
 
 -- Configure Overture Maps release version (update as needed for latest stable release)
 -- Check https://docs.overturemaps.org/release/latest/ for updates
-SET VARIABLE overture_release = '2025-10-22.0';
+SET VARIABLE overture_release = '2025-11-19.0';
 
 ---
+-- non-residential land_use
 
 COPY (
     SELECT
         subtype,
         class,
         surface,
+        names,
+        level,
         geometry -- DuckDB v.1.1.0 will autoload this as a `geometry` type
-    FROM read_parquet('s3://overturemaps-us-west-2/release/' || getvariable('overture_release') || '/theme=base/type=land_use/*', filename=true, hive_partitioning=1)
+    FROM read_parquet(
+        's3://overturemaps-us-west-2/release/' || getvariable('overture_release') ||
+        '/theme=base/type=land_use/*',
+        filename=true,
+        hive_partitioning=1
+    )
     WHERE
         subtype NOT IN ('residential')
         AND bbox.xmin < $extent_xmax AND bbox.xmax > $extent_xmin
@@ -25,15 +33,24 @@ COPY (
 ) TO '{{overture_data_dir}}/land_use.parquet' 
 WITH (FORMAT PARQUET, COMPRESSION 'ZSTD');
 
+
 -- break
+-- residential land_use
 
 COPY (
     SELECT
         subtype,
         class,
         surface,
-        geometry -- DuckDB v.1.1.0 will autoload this as a `geometry` type
-    FROM read_parquet('s3://overturemaps-us-west-2/release/' || getvariable('overture_release') || '/theme=base/type=land_use/*', filename=true, hive_partitioning=1)
+        names,
+        level,
+        geometry
+    FROM read_parquet(
+        's3://overturemaps-us-west-2/release/' || getvariable('overture_release') ||
+        '/theme=base/type=land_use/*',
+        filename=true,
+        hive_partitioning=1
+    )
     WHERE
         subtype IN ('residential')
         AND bbox.xmin < $extent_xmax AND bbox.xmax > $extent_xmin
@@ -47,12 +64,17 @@ COPY (
     SELECT
         subtype,
         class,
+        names,
+        is_salt,
+        is_intermittent,
+        level,
         geometry -- DuckDB v.1.1.0 will autoload this as a `geometry` type
-    FROM 
-        -- Uncomment one of the following sources:
-        read_parquet('s3://overturemaps-us-west-2/release/' || getvariable('overture_release') || '/theme=base/type=water/*', filename=true, hive_partitioning=1)
-        -- read_parquet('/path/to/geofabrik/water_features.parquet')
-        -- read_shapefile('/path/to/natural_earth/water_features.shp')
+    FROM read_parquet(
+        's3://overturemaps-us-west-2/release/' || getvariable('overture_release') ||
+        '/theme=base/type=water/*',
+        filename=true,
+        hive_partitioning=1
+    )
     WHERE
         subtype IN ('ocean', 'lake', 'pond', 'reservoir', 'river', 'stream', 'water', 'canal')
         AND bbox.xmin < $extent_xmax AND bbox.xmax > $extent_xmin
@@ -68,8 +90,13 @@ COPY (
         subtype,
         class,
         subclass,
-        geometry -- DuckDB v.1.1.0 will autoload this as a `geometry` type
-    FROM read_parquet('s3://overturemaps-us-west-2/release/' || getvariable('overture_release') || '/theme=transportation/type=segment/*', filename=true, hive_partitioning=1)
+        geometry
+    FROM read_parquet(
+        's3://overturemaps-us-west-2/release/' || getvariable('overture_release') ||
+        '/theme=transportation/type=segment/*',
+        filename=true,
+        hive_partitioning=1
+    )
     WHERE
         subtype = 'road'
         AND bbox.xmin < $extent_xmax AND bbox.xmax > $extent_xmin
@@ -83,8 +110,13 @@ COPY (
     SELECT
         height,
         level,
-        geometry -- DuckDB v.1.1.0 will autoload this as a `geometry` type
-    FROM read_parquet('s3://overturemaps-us-west-2/release/' || getvariable('overture_release') || '/theme=buildings/type=building/*', filename=true, hive_partitioning=1)
+        geometry
+    FROM read_parquet(
+        's3://overturemaps-us-west-2/release/' || getvariable('overture_release') ||
+        '/theme=buildings/type=building/*',
+        filename=true,
+        hive_partitioning=1
+    )
     WHERE
         bbox.xmin < $extent_xmax AND bbox.xmax > $extent_xmin
         AND bbox.ymin < $extent_ymax AND bbox.ymax > $extent_ymin
@@ -93,12 +125,20 @@ WITH (FORMAT PARQUET, COMPRESSION 'ZSTD');
 
 -- break
 
-
 COPY (
     SELECT
         subtype,
-        geometry -- DuckDB v.1.1.0 will autoload this as a `geometry` type
-    FROM read_parquet('s3://overturemaps-us-west-2/release/' || getvariable('overture_release') || '/theme=base/type=land_cover/*', filename=true, hive_partitioning=1)
+        -- cartography is a top-level struct column
+        TRY_CAST(cartography.min_zoom AS INTEGER)  AS min_zoom,
+        TRY_CAST(cartography.max_zoom AS INTEGER)  AS max_zoom,
+        TRY_CAST(cartography.sort_key AS INTEGER)  AS sort_key,
+        geometry
+    FROM read_parquet(
+        's3://overturemaps-us-west-2/release/' || getvariable('overture_release') ||
+        '/theme=base/type=land_cover/*',
+        filename=true,
+        hive_partitioning=1
+    )
     WHERE
         bbox.xmin < $extent_xmax AND bbox.xmax > $extent_xmin
         AND bbox.ymin < $extent_ymax AND bbox.ymax > $extent_ymin
@@ -114,8 +154,14 @@ COPY (
         level,
         height,
         surface,
+        names,
         geometry -- DuckDB v.1.1.0 will autoload this as a `geometry` type
-    FROM read_parquet('s3://overturemaps-us-west-2/release/' || getvariable('overture_release') || '/theme=base/type=infrastructure/*', filename=true, hive_partitioning=1)
+    FROM read_parquet(
+        's3://overturemaps-us-west-2/release/' || getvariable('overture_release') ||
+        '/theme=base/type=infrastructure/*',
+        filename=true,
+        hive_partitioning=1
+    )
     WHERE
         bbox.xmin < $extent_xmax AND bbox.xmax > $extent_xmin
         AND bbox.ymin < $extent_ymax AND bbox.ymax > $extent_ymin

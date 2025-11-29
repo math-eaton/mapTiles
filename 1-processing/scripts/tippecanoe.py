@@ -62,6 +62,7 @@ LAYER_SETTINGS = {
         '--extend-zooms-if-still-dropping-maximum=14',
         '--coalesce-densest-as-needed',
         '--drop-densest-as-needed',
+        '-y', 'subtype'
     ],
 
     'land_cover.fgb': [
@@ -102,15 +103,22 @@ LAYER_SETTINGS = {
 
     # Roads - linear features with line-specific optimizations
     'roads.fgb': [
-        '--no-line-simplification',
-        # '--drop-rate=0.15',
+        '--minimum-zoom=7',
+        # '--maximum-zoom=15',
+        '--buffer=16',
+        '--hilbert',
+        # '--no-line-simplification',
         # '--drop-smallest',
-        '--simplification=1', 
         # '--minimum-detail=5',  # Added to ensure minimum detail level
         '--no-simplification-of-shared-nodes',
-        # '--no-clipping',
-        '--extend-zooms-if-still-dropping-maximum=15',
+        '--no-clipping',
+        '--extend-zooms-if-still-dropping-maximum=13',
         '--coalesce-smallest-as-needed',
+        '--simplification=10',
+        '-P',
+        '-y', 'class',  
+        '-y', 'subclass',
+        '-y', 'subtype',
         # '--maximum-tile-bytes=4194304',  # Increased limit to 4MB for road density
         # '--drop-densest-as-needed',  # Drop densest features when tiles get too large
         '-j', '{"*":["any",[">=","$zoom",11],["!=","class","path"]]}',  # Exclude class=path below zoom 11
@@ -160,8 +168,11 @@ LAYER_SETTINGS = {
         '--low-detail=8',
         '--full-detail=12',
         '--coalesce-densest-as-needed',  # Merge features when needed, maintaining coverage
-        '--extend-zooms-if-still-dropping-maximum=16',
+        '--extend-zooms-if-still-dropping-maximum=15',
         '--no-tiny-polygon-reduction',
+        '-y', 'airesante',
+        '-y', 'zonesante',
+        '-y', 'province'
     ],
 
 
@@ -175,8 +186,10 @@ LAYER_SETTINGS = {
         '--low-detail=8',
         '--full-detail=12',
         '--coalesce-densest-as-needed',  # Merge features when needed, maintaining coverage
-        '--extend-zooms-if-still-dropping-maximum=16',
+        '--extend-zooms-if-still-dropping-maximum=15',
         '--no-tiny-polygon-reduction',
+        '-y', 'zonesante',
+        '-y', 'province'
     ],
 
     # Health zone centroids - point labels for interior placement
@@ -226,6 +239,7 @@ LAYER_SETTINGS = {
         '--drop-smallest-as-needed',  # Drop smallest when tiles too large
         '--gamma=1.4',  # Reduce density of clustered settlements
         '--extend-zooms-if-still-dropping-maximum=14',
+        '-y', 'type'
         ],
 
     # Administrative boundaries - provinces (top-level admin units)
@@ -288,7 +302,131 @@ def get_layer_settings(filename):
     # No match found
     return []
 
-def build_tippecanoe_command(input_file, output_file, layer_name, extent=None):
+def extract_cartography_zoom_range(input_file):
+    """
+    Extract min_zoom and max_zoom from Overture cartography properties.
+    
+    Reads the first 1000 features from a FlatGeobuf/GeoJSON file and finds
+    the min/max zoom levels. Supports both flattened columns (min_zoom, max_zoom)
+    from DuckDB extraction or nested cartography struct.
+    
+    Args:
+        input_file (str): Path to input file (FlatGeobuf, GeoJSON, or GeoJSONSeq)
+        
+    Returns:
+        tuple: (min_zoom, max_zoom) or (None, None) if not found
+    """
+    import os
+    try:
+        file_ext = os.path.splitext(input_file)[1].lower()
+        
+        if file_ext == '.fgb':
+            # Use fiona for FlatGeobuf (streaming, efficient)
+            try:
+                import fiona
+                min_zoom, max_zoom = None, None
+                sample_count = 0
+                max_samples = 1000
+                
+                with fiona.open(input_file, 'r') as src:
+                    for feature in src:
+                        if sample_count >= max_samples:
+                            break
+                        
+                        props = feature.get('properties', {})
+                        
+                        # Try flattened columns first (from DuckDB extraction)
+                        feat_min = props.get('min_zoom')
+                        feat_max = props.get('max_zoom')
+                        
+                        # Fall back to nested cartography struct
+                        if feat_min is None or feat_max is None:
+                            cartography = props.get('cartography', {})
+                            if isinstance(cartography, dict):
+                                feat_min = feat_min or cartography.get('min_zoom')
+                                feat_max = feat_max or cartography.get('max_zoom')
+                        
+                        if feat_min is not None:
+                            min_zoom = feat_min if min_zoom is None else min(min_zoom, feat_min)
+                        if feat_max is not None:
+                            max_zoom = feat_max if max_zoom is None else max(max_zoom, feat_max)
+                        
+                        sample_count += 1
+                
+                return (min_zoom, max_zoom)
+            except ImportError:
+                pass  # Fall through to return None
+        
+        elif file_ext in ['.geojson', '.json', '.geojsonseq']:
+            # Handle GeoJSON/GeoJSONSeq
+            import json
+            min_zoom, max_zoom = None, None
+            sample_count = 0
+            max_samples = 1000
+            
+            with open(input_file, 'r') as f:
+                if file_ext == '.geojsonseq':
+                    # Line-delimited GeoJSON
+                    for line in f:
+                        if sample_count >= max_samples:
+                            break
+                        try:
+                            feature = json.loads(line.strip())
+                            props = feature.get('properties', {})
+                            
+                            # Try flattened columns first
+                            feat_min = props.get('min_zoom')
+                            feat_max = props.get('max_zoom')
+                            
+                            # Fall back to nested cartography struct
+                            if feat_min is None or feat_max is None:
+                                cartography = props.get('cartography', {})
+                                if isinstance(cartography, dict):
+                                    feat_min = feat_min or cartography.get('min_zoom')
+                                    feat_max = feat_max or cartography.get('max_zoom')
+                            
+                            if feat_min is not None:
+                                min_zoom = feat_min if min_zoom is None else min(min_zoom, feat_min)
+                            if feat_max is not None:
+                                max_zoom = feat_max if max_zoom is None else max(max_zoom, feat_max)
+                            
+                            sample_count += 1
+                        except json.JSONDecodeError:
+                            continue
+                else:
+                    # Standard GeoJSON
+                    data = json.load(f)
+                    features = data.get('features', [])
+                    
+                    for feature in features[:max_samples]:
+                        props = feature.get('properties', {})
+                        
+                        # Try flattened columns first
+                        feat_min = props.get('min_zoom')
+                        feat_max = props.get('max_zoom')
+                        
+                        # Fall back to nested cartography struct
+                        if feat_min is None or feat_max is None:
+                            cartography = props.get('cartography', {})
+                            if isinstance(cartography, dict):
+                                feat_min = feat_min or cartography.get('min_zoom')
+                                feat_max = feat_max or cartography.get('max_zoom')
+                        
+                        if feat_min is not None:
+                            min_zoom = feat_min if min_zoom is None else min(min_zoom, feat_min)
+                        if feat_max is not None:
+                            max_zoom = feat_max if max_zoom is None else max(max_zoom, feat_max)
+            
+            return (min_zoom, max_zoom)
+    
+    except Exception as e:
+        # Silently fail - not all layers have cartography properties
+        pass
+    
+    return (None, None)
+
+
+def build_tippecanoe_command(input_file, output_file, layer_name, extent=None, use_overture_zooms=True):
     """
     Build complete tippecanoe command for a layer.
     
@@ -297,6 +435,7 @@ def build_tippecanoe_command(input_file, output_file, layer_name, extent=None):
         output_file (str): Path to output PMTiles file  
         layer_name (str): Layer name for the tiles
         extent (tuple): Optional bounding box (xmin, ymin, xmax, ymax)
+        use_overture_zooms (bool): If True, extract and use zoom levels from Overture cartography properties
         
     Returns:
         list: Complete command arguments for subprocess
@@ -311,6 +450,24 @@ def build_tippecanoe_command(input_file, output_file, layer_name, extent=None):
     # Add layer-specific settings
     layer_settings = get_layer_settings(filename)
     cmd.extend(layer_settings)
+    
+    # Try to extract and apply Overture cartography zoom levels
+    if use_overture_zooms:
+        min_zoom, max_zoom = extract_cartography_zoom_range(input_file)
+        
+        if min_zoom is not None or max_zoom is not None:
+            # Check if layer_settings already has zoom constraints
+            has_min_zoom = any('--minimum-zoom' in str(s) for s in layer_settings)
+            has_max_zoom = any('--maximum-zoom' in str(s) for s in layer_settings)
+            
+            # Apply Overture zoom levels if not already constrained by layer settings
+            if min_zoom is not None and not has_min_zoom:
+                cmd.extend(['--minimum-zoom', str(min_zoom)])
+                print(f"  ℹ Using Overture min_zoom={min_zoom} for {layer_name}")
+            
+            if max_zoom is not None and not has_max_zoom:
+                cmd.extend(['--maximum-zoom', str(max_zoom)])
+                print(f"  ℹ Using Overture max_zoom={max_zoom} for {layer_name}")
     
     # Add extent clipping if provided
     if extent:

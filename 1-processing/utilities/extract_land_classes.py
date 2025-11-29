@@ -5,7 +5,7 @@ for cartographic visualization of different land cover types.
 """
 
 import json
-import pandas as pd
+import polars as pl
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 from collections import defaultdict, Counter
@@ -324,10 +324,10 @@ class LandClassExtractor:
                     'percentage': round((self.class_counts[class_name] / sum(self.class_counts.values())) * 100, 2)
                 })
         
-        df = pd.DataFrame(csv_data)
-        df = df.sort_values('feature_count', ascending=False)
+        df = pl.DataFrame(csv_data)
+        df = df.sort('feature_count', reverse=True)
         csv_file = '/Users/matthewheaton/GitHub/0_CIESIN/GRID3_mapProduction/scripts/vectorTiling/overture/land_class_colors.csv'
-        df.to_csv(csv_file, index=False)
+        df.write_csv(csv_file)
         print(f"Color schemes exported to CSV: {csv_file}")
         
         # Export ArcGIS style format (simplified)

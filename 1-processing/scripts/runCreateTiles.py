@@ -456,7 +456,7 @@ def get_layer_tippecanoe_settings(layer_name, filename_or_path=None):
     
     return settings
 
-def get_tippecanoe_command(input_path, tile_path, layer_name, extent=None):
+def get_tippecanoe_command(input_path, tile_path, layer_name, extent=None, use_overture_zooms=True):
     """Generate optimized tippecanoe command for converting GeoJSON/GeoParquet to PMTiles
     
     Args:
@@ -464,11 +464,28 @@ def get_tippecanoe_command(input_path, tile_path, layer_name, extent=None):
         tile_path (Path): Path for output PMTiles file
         layer_name (str): Name for the tile layer
         extent (tuple): Optional bounding box (xmin, ymin, xmax, ymax)
+        use_overture_zooms (bool): If True, extract and use zoom levels from Overture cartography properties
     
     Returns:
         list: Command arguments for subprocess.run()
     """
     
+    # Try to use tippecanoe.py's build_tippecanoe_command if available
+    # This provides centralized zoom level extraction from Overture cartography
+    if build_tippecanoe_command is not None:
+        try:
+            return build_tippecanoe_command(
+                str(input_path), 
+                str(tile_path), 
+                layer_name, 
+                extent=extent,
+                use_overture_zooms=use_overture_zooms
+            )
+        except Exception as e:
+            # Fall through to manual command building
+            pass
+    
+    # Fallback: Manual command building (original implementation)
     # Base tippecanoe command with common optimizations
     base_cmd = [
         'tippecanoe',

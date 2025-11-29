@@ -1,17 +1,18 @@
 """
 Generate polygon centroids and centerlines for label positioning.
 
-Creates point features at the interior centroid of each polygon, and 
-centerline features along the medial axis of polygons. Preserves all 
-attributes. Useful for placing labels on administrative boundaries and 
-water features.
+Creates point features at the interior centroid of each polygon with optimal
+rotation angles for text labels, and centerline features along the medial axis 
+of polygons. Preserves all attributes. Useful for placing labels on 
+administrative boundaries and water features.
 
 Usage:
-    python generateCenters.py input.fgb output_centroids.fgb
-    python generateCenters.py --centerlines water.fgb water_centerlines.fgb
+    python generateLabels.py input.fgb output_centroids.fgb
+    python generateLabels.py --centerlines water.fgb water_centerlines.fgb
     
 Features:
     - Centroids: Uses true interior centroids (guaranteed inside polygon)
+    - Label rotation: Calculates optimal text angle from minimum rotated rectangle
     - Centerlines: Generates medial axis skeleton from polygon boundaries
     - Preserves all original attributes
     - Handles multipolygons correctly
@@ -69,7 +70,12 @@ def _work_crs_gdf(gdf):
 
 def generate_centroids(input_file, output_file, verbose=True):
     """
-    Generate centroid points from polygon features.
+    Generate centroid points from polygon features with optimal rotation angles.
+    
+    Creates point features at the interior centroid of each polygon and calculates
+    the optimal rotation angle for text labels based on the polygon's oriented
+    bounding box (minimum rotated rectangle). This ensures labels align with the
+    natural orientation of elongated or diagonal polygons.
     
     Args:
         input_file (str/Path): Input polygon file (FlatGeobuf, GeoJSON, etc.)
@@ -78,6 +84,11 @@ def generate_centroids(input_file, output_file, verbose=True):
         
     Returns:
         dict: Results with success status and feature count
+        
+    Output attributes:
+        - All original polygon attributes are preserved
+        - label_rotation (float): Optimal rotation angle in degrees (-90 to 90)
+          Calculated from the minimum rotated rectangle's longest edge
     """
     input_path = Path(input_file)
     output_path = Path(output_file)
@@ -112,9 +123,56 @@ def generate_centroids(input_file, output_file, verbose=True):
         # Generate representative points (guaranteed to be inside polygon)
         # This is better than geometric centroid which can fall outside complex polygons
         if verbose:
-            print("  Computing interior centroids...")
+            print("  Computing interior centroids with rotation angles...")
         
+        # Calculate rotation angle for best-fit orientation
+        def calculate_rotation_angle(geom):
+            """Calculate the optimal rotation angle for a polygon using minimum rotated rectangle."""
+            try:
+                # Get the minimum rotated rectangle (oriented bounding box)
+                min_rect = geom.minimum_rotated_rectangle
+                
+                # Get coordinates of the rectangle
+                coords = list(min_rect.exterior.coords)
+                
+                # Calculate angle between first two points (longest edge)
+                dx = coords[1][0] - coords[0][0]
+                dy = coords[1][1] - coords[0][1]
+                
+                # Calculate lengths of both edges
+                edge1_len = np.sqrt(dx**2 + dy**2)
+                dx2 = coords[2][0] - coords[1][0]
+                dy2 = coords[2][1] - coords[1][1]
+                edge2_len = np.sqrt(dx2**2 + dy2**2)
+                
+                # Use the longer edge for rotation calculation
+                if edge2_len > edge1_len:
+                    dx, dy = dx2, dy2
+                
+                # Calculate angle in degrees (counterclockwise from east)
+                angle = np.degrees(np.arctan2(dy, dx))
+                
+                # Normalize to [-90, 90] range for text rotation
+                # This ensures text is never upside down
+                while angle > 90:
+                    angle -= 180
+                while angle < -90:
+                    angle += 180
+                
+                return angle
+            except Exception:
+                return 0.0  # Default to no rotation if calculation fails
+        
+        # Store original geometries for rotation calculation
+        original_geoms = gdf.geometry.copy()
+        
+        # Generate centroids
         gdf['geometry'] = gdf.geometry.representative_point()
+        
+        # Calculate rotation angles based on original polygon orientation
+        if verbose:
+            print("  Calculating optimal rotation angles...")
+        gdf['label_rotation'] = original_geoms.apply(calculate_rotation_angle)
         
         # Verify all geometries are now points
         assert all(gdf.geometry.type == 'Point'), "Failed to convert all features to points"
@@ -528,11 +586,11 @@ def main():
     """Command-line interface for centroid and centerline generation."""
     if len(sys.argv) < 3:
         print("Usage:")
-        print("  Centroids:   python generateCenters.py <input_polygons.fgb> <output_centroids.fgb>")
-        print("  Centerlines: python generateCenters.py --centerlines <input_polygons.fgb> <output_centerlines.fgb>")
+        print("  Centroids:   python generateLabels.py <input_polygons.fgb> <output_centroids.fgb>")
+        print("  Centerlines: python generateLabels.py --centerlines <input_polygons.fgb> <output_centerlines.fgb>")
         print("\nExamples:")
-        print("  python generateCenters.py health_zones.fgb health_zones_centroids.fgb")
-        print("  python generateCenters.py --centerlines water.fgb water_centerlines.fgb")
+        print("  python generateLabels.py health_zones.fgb health_zones_centroids.fgb")
+        print("  python generateLabels.py --centerlines water.fgb water_centerlines.fgb")
         sys.exit(1)
     
     # Check for --centerlines flag

@@ -179,14 +179,12 @@ def download_overture_data(extent, buffer_degrees=0, template_path=None, verbose
                 # Extract URL and data type from the section
                 url_info = get_db_url(section)
                 if url_info and verbose:
-                    desc = f"Section {i + 1}: {url_info['description']}"
-                    tqdm.write(f"Executing {desc}")
+                    tqdm.write(f"Executing {url_info['description']}")
                     tqdm.write(f"  -> Querying: {url_info['url']}")
                     tqdm.write(f"  -> Output: {url_info['output_file']}")
                     results["output_files"].append(url_info['output_file'])
                 elif verbose:
-                    desc = f"Section {i + 1}"
-                    tqdm.write(f"Executing {desc}...")
+                    tqdm.write(f"Executing section {i + 1}...")
                 
                 try:
                     # Execute the SQL section
