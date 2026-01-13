@@ -67,7 +67,7 @@ OUTPUT_DIR = DATA_DIR / "3-pmtiles"
 TILE_DIR = OUTPUT_DIR  # Alias for consistency with scripts
 
 # Template paths
-TILE_QUERIES_TEMPLATE = SCRIPTS_DIR / "tileQueries.template"
+TILE_QUERIES_TEMPLATE = SCRIPTS_DIR / "tilequeries.sql"
 TIPPECANOE_TEMPLATE = SCRIPTS_DIR / "tippecanoe.template"
 
 

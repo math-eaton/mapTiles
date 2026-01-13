@@ -2,7 +2,7 @@
 """
 update_overture_release.py - Helper script to update Overture Maps release version
 
-This script updates the overture_release variable in tileQueries.template
+This script updates the overture_release variable in tilequeries.sql
 to use the latest or a specified release version.
 
 Usage:
@@ -92,7 +92,7 @@ def main():
         '--template',
         type=Path,
         default=TILE_QUERIES_TEMPLATE,
-        help='Path to tileQueries.template file'
+        help='Path to tilequeries.sql file'
     )
     
     args = parser.parse_args()

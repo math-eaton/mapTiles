@@ -152,7 +152,7 @@
           "bunker",
           "#d6d3d1",
           "water_hazard",
-          "#A0D8ED",
+          "#ffffff00",
           "track",
           "#f97316",
           "camp_site",
@@ -251,11 +251,11 @@
             "heath",
             "#c7e0b2",
             "wetland",
-            "#b9e6fa",
+            "#ffffff00",
             "swamp",
-            "#a3def8",
+            "#ffffff00",
             "marsh",
-            "#8dd7f6",
+            "#ffffff00",
             "crop",
             "#f7eab7",
             "cropland",
@@ -301,11 +301,11 @@
             "heath",
             "#769b4a",
             "wetland",
-            "#4fc3f7",
+            "#ffffff00",
             "swamp",
-            "#29b6f6",
+            "#ffffff00",
             "marsh",
-            "#03a9f4",
+            "#ffffff00",
             "crop",
             "#e6c76a",
             "cropland",
@@ -655,8 +655,8 @@
             "residential",
             "#66c2a4",
             "unclassified",
-            "#66c2a4",
-            "#cccccc"
+            "#373A36",
+            "#373A36"
           ],
           10,
           [
@@ -669,14 +669,14 @@
             "primary",
             "#fee08b",
             "secondary",
-            "#a0804a",
+            "#FFB25B",
             "tertiary",
             "#91cf60",
             "residential",
             "#91cf60",
             "unclassified",
-            "#91cf60",
-            "#000000"
+            "#3F4444",
+            "#3F4444"
           ],
           13,
           [
@@ -687,16 +687,16 @@
             "trunk",
             "#d73027",
             "primary",
-            "#fee08b",
+            "#FFE900",
             "secondary",
-            "#a0804a",
+            "#FFA300",
             "tertiary",
             "#91cf60",
             "residential",
             "#91cf60",
             "unclassified",
-            "#91cf60",
-            "#000000"
+            "#505759",
+            "#505759"
           ]
         ],
         "line-width": [
@@ -718,10 +718,10 @@
             "tertiary",
             0.2,
             "residential",
-            0.1,
+            0.2,
             "unclassified",
-            0.1,
-            0.1
+            0.2,
+            0.2
           ],
           10,
           [
@@ -819,75 +819,37 @@
             "primary",
             0.5,
             "secondary",
-            0.2,
-            "tertiary",
-            0.1,
-            "residential",
-            0,
-            "unclassified",
-            0,
-            0
-          ],
-          11,
-          [
-            "match",
-            ["get", "class"],
-            "motorway",
-            1,
-            "trunk",
-            0.8,
-            "primary",
-            0.6,
-            "secondary",
             0.4,
             "tertiary",
             0.2,
             "residential",
-            0,
-            "unclassified",
-            0,
-            0
-          ],
-          13,
-          [
-            "match",
-            ["get", "class"],
-            "motorway",
-            1,
-            "trunk",
-            1,
-            "primary",
-            0.8,
-            "secondary",
-            0.6,
-            "tertiary",
-            0.4,
-            "residential",
             0.2,
-            "unclassified",
-            0.2,
-            0.2
-          ],
-          15,
-          [
-            "match",
-            ["get", "class"],
-            "motorway",
-            1,
-            "trunk",
-            1,
-            "primary",
-            1,
-            "secondary",
-            0.8,
-            "tertiary",
-            0.6,
-            "residential",
-            0.4,
             "unclassified",
             0.4,
             0.4
-          ]
+          ],
+          10,
+          [
+            "match",
+            ["get", "class"],
+            "motorway",
+            1,
+            "trunk",
+            0.8,
+            "primary",
+            0.6,
+            "secondary",
+            0.5,
+            "tertiary",
+            0.2,
+            "residential",
+            0.2,
+            "unclassified",
+            0.4,
+            0.4
+          ],
+          11,
+          1
         ]
       }
     },
@@ -1040,55 +1002,17 @@
             "primary",
             0.6,
             "secondary",
-            0.4,
-            "tertiary",
-            0.2,
-            "residential",
-            0,
-            "unclassified",
-            0,
-            0
-          ],
-          13,
-          [
-            "match",
-            ["get", "class"],
-            "motorway",
-            1,
-            "trunk",
-            1,
-            "primary",
-            0.8,
-            "secondary",
             0.6,
             "tertiary",
-            0.4,
+            0.2,
             "residential",
             0.2,
             "unclassified",
             0.2,
             0.2
           ],
-          15,
-          [
-            "match",
-            ["get", "class"],
-            "motorway",
-            1,
-            "trunk",
-            1,
-            "primary",
-            1,
-            "secondary",
-            0.8,
-            "tertiary",
-            0.6,
-            "residential",
-            0.4,
-            "unclassified",
-            0.4,
-            0.4
-          ]
+          13,
+          1
         ]
       }
     },
@@ -1634,7 +1558,7 @@
       "source": "land-residential-tiles",
       "source-layer": "land_residential",
       "layout": {
-        "visibility": "none"
+        "visibility": "visible"
       },
       "paint": {
         "fill-color": [
@@ -1765,7 +1689,7 @@
       }
     },
     {
-      "id": "health-areas-centerline",
+      "id": "health-areas-casing",
       "type": "line",
       "source": "health-areas-tiles",
       "source-layer": "health-areas",
@@ -1832,6 +1756,37 @@
         ],
         "line-width": ["interpolate", ["linear"], ["zoom"], 6, 0.4, 14, 3],
         "line-opacity": 1
+      }
+    },
+        {
+      "id": "health-zones-casing",
+      "type": "line",
+      "source": "health-zones-tiles",
+      "source-layer": "health-zones",
+      "minzoom": 6,
+      "layout": {
+        "visibility": "visible"
+      },
+      "paint": {
+        "line-color": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          6,
+          "#fff",
+          15,
+          "#fff"
+        ],
+        "line-width": ["interpolate", ["linear"], ["zoom"], 6, 3, 15, 5],
+        "line-opacity": [
+          "interpolate",
+          ["exponential", 1.5],
+          ["zoom"],
+          6,
+          0,
+          15,
+          0.85
+        ]
       }
     },
     {
@@ -2194,8 +2149,6 @@
           "interpolate",
           ["linear"],
           ["zoom"],
-          9, 
-          16,
           10,
           8,
           12,
@@ -2221,7 +2174,7 @@
           "interpolate",
           ["exponential", 1.25],
           ["zoom"],
-          13.85,
+          13.95,
           "#D0D3D4",
           14,
           "#3F4444"
@@ -2232,7 +2185,7 @@
           ["zoom"],
           12.5,
           0,
-          13,
+          14,
           0.4,
           15,
           1.8

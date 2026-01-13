@@ -54,11 +54,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.getLabelPriorities = () => overtureMap.getLabelPriorities();
         window.printLayerOrder = () => overtureMap.printLayerOrder();
         
-        console.log('Overture map initialization complete');
-        console.log('💡 Debug commands available:');
-        console.log('  - printLabelPriorities() - Show label priority hierarchy');
-        console.log('  - getLabelPriorities() - Get label priority configuration');
-        console.log('  - printLayerOrder() - Show current layer stack');
+        // console.log('Overture map initialization complete');
+        // console.log('💡 Debug commands available:');
+        // console.log('  - printLabelPriorities() - Show label priority hierarchy');
+        // console.log('  - getLabelPriorities() - Get label priority configuration');
+        // console.log('  - printLayerOrder() - Show current layer stack');
         
         // Ensure the legend is populated after the map is initialized
         const legendContainer = document.getElementById('map-legend');

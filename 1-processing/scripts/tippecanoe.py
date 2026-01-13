@@ -35,6 +35,8 @@ LAYER_SETTINGS = {
         '--drop-densest-as-needed',
         '--extend-zooms-if-still-dropping-maximum=15',
         '--minimum-zoom=11',
+        '--hilbert',
+        '-y', 'height'
     ],
 
     # Infrastructure polygons
@@ -76,17 +78,19 @@ LAYER_SETTINGS = {
         '--hilbert',
         '--coalesce-densest-as-needed',
         '--drop-densest-as-needed',
-        '--extend-zooms-if-still-dropping-maximum=13',
+        '--extend-zooms-if-still-dropping-maximum=14',
     ],
 
     'land_residential.fgb': [
+        '--hilbert',
         '--no-polygon-splitting',
         '--detect-shared-borders',
-        '--simplification=10',  # Added for geometry simplification
-        '--drop-rate=0.2',  # Increased from 0.1
+        # '--simplification=5',  # Added for geometry simplification
+        # '--drop-rate=0.2',  # Increased from 0.1
         '--coalesce-densest-as-needed',
         '--drop-densest-as-needed',
-        '--extend-zooms-if-still-dropping-maximum=13',
+        '--extend-zooms-if-still-dropping-maximum=16',
+        '-y', 'subtype'
     ],
 
     'land.fgb': [
@@ -112,16 +116,16 @@ LAYER_SETTINGS = {
         # '--minimum-detail=5',  # Added to ensure minimum detail level
         '--no-simplification-of-shared-nodes',
         '--no-clipping',
-        '--extend-zooms-if-still-dropping-maximum=13',
+        '--extend-zooms-if-still-dropping-maximum=16',
         '--coalesce-smallest-as-needed',
-        '--simplification=10',
+        # '--simplification=5',
         '-P',
         '-y', 'class',  
         '-y', 'subclass',
         '-y', 'subtype',
         # '--maximum-tile-bytes=4194304',  # Increased limit to 4MB for road density
         # '--drop-densest-as-needed',  # Drop densest features when tiles get too large
-        '-j', '{"*":["any",[">=","$zoom",11],["!=","class","path"]]}',  # Exclude class=path below zoom 11
+        '-j', '{"*":["any",[">=","$zoom",10],["!=","class","path"]]}',  # Exclude class=path below zoom 10
     ],
 
     # Water polygons - enhanced detail at zoom 13+
@@ -139,7 +143,7 @@ LAYER_SETTINGS = {
         # '--minimum-zoom=7',
         '--buffer=8',
         '--maximum-zoom=13',
-        # '-j', '{"*":["all",["any",[">=","$zoom",12],["!=","class","stream"]],["any",[">=","$zoom",10],["==","$type","Polygon"]]]}',  # Any streams below zoom 12, only polygons below zoom 10
+        '-j', '{"*":["all",["any",[">=","$zoom",12],["!=","class","stream"]],["any",[">=","$zoom",10],["==","$type","Polygon"]]]}',  # Any streams below zoom 12, only polygons below zoom 10
     ],
 
     # # Point features - places and placenames
@@ -310,6 +314,9 @@ def extract_cartography_zoom_range(input_file):
     the min/max zoom levels. Supports both flattened columns (min_zoom, max_zoom)
     from DuckDB extraction or nested cartography struct.
     
+    Also checks for sort_key and level properties which are useful for z-ordering
+    in the rendering pipeline.
+    
     Args:
         input_file (str): Path to input file (FlatGeobuf, GeoJSON, or GeoJSONSeq)
         
@@ -429,6 +436,14 @@ def extract_cartography_zoom_range(input_file):
 def build_tippecanoe_command(input_file, output_file, layer_name, extent=None, use_overture_zooms=True):
     """
     Build complete tippecanoe command for a layer.
+    
+    Automatically extracts cartography properties (min_zoom, max_zoom, sort_key) and level
+    from Overture Maps data when available. These properties are used for:
+    - min_zoom/max_zoom: Optimal zoom range for each feature
+    - sort_key: Z-ordering/drawing priority within tiles
+    - level: Vertical level for multi-level features (buildings, infrastructure)
+    
+    All these properties are preserved in the output PMTiles for use by the map renderer.
     
     Args:
         input_file (str): Path to input GeoJSON/GeoJSONSeq file

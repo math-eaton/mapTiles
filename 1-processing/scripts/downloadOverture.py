@@ -83,7 +83,7 @@ def download_overture_data(extent, buffer_degrees=0, template_path=None, verbose
     Args:
         extent (tuple): (xmin, ymin, xmax, ymax) in WGS84 coordinates
         buffer_degrees (float): Buffer around extent in degrees (default: 0)
-        template_path (str|Path): Path to SQL template file (default: tileQueries.template)
+        template_path (str|Path): Path to SQL template file (default: tilequeries.sql)
         verbose (bool): Show progress information (default: True)
         project_root (str|Path|None): Optional project root path to override module default
         overture_data_dir (str|Path|None): Optional data directory path to override module default
@@ -133,7 +133,7 @@ def download_overture_data(extent, buffer_degrees=0, template_path=None, verbose
     
     # Read the SQL template file
     if template_path is None:
-        template_path = Path(__file__).parent / 'tileQueries.template'
+        template_path = Path(__file__).parent / 'tilequeries.sql'
     else:
         template_path = Path(template_path)
     
@@ -224,7 +224,7 @@ def main():
     parser.add_argument('--buffer', type=float, default=0.2,
                         help='Buffer around extent in degrees')
     parser.add_argument('--template', 
-                        help='Path to SQL template file (default: tileQueries.template)')
+                        help='Path to SQL template file (default: tilequeries.sql)')
     parser.add_argument('--verbose', action='store_true', default=True,
                         help='Show detailed progress information')
     
