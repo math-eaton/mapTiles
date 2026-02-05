@@ -1386,7 +1386,7 @@
       "type": "fill-extrusion",
       "source": "buildings-tiles",
       "source-layer": "building",
-      "minzoom": 14,
+      "minzoom": 13,
       "maxzoom": 16,
       "layout": {
         "visibility": "visible"
