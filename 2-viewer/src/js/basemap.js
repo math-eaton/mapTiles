@@ -188,19 +188,20 @@ class OvertureMap {
             // Try to get tilejson from the configured tile endpoint
             let tilejsonUrl;
             
-            if (tileConfig.currentEndpoint === 'caddy') {
+            if (tileConfig.currentEndpoint === 'cloudflare') {
+                // Use Cloudflare Worker endpoint
+                tilejsonUrl = `${tileConfig.endpoints.cloudflare.url}/tilejson.json`;
+                console.log('Using Cloudflare Worker for tilejson:', tilejsonUrl);
+            } else if (tileConfig.currentEndpoint === 'caddy') {
                 // Use Caddy server endpoint
                 tilejsonUrl = `${tileConfig.endpoints.caddy.pmtiles}/tilejson.json`;
                 console.log('Using Caddy server for tilejson:', tilejsonUrl);
             } else {
-                // Use GitHub Pages or local fallback
+                // Use local fallback
                 const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-                const isGitHubPages = window.location.hostname.includes('github.io');
-                const repoName = isGitHubPages ? window.location.pathname.split('/')[1] : '';
-                const basePath = isGitHubPages ? `/${repoName}` : '';
-                const tileDir = isLocalhost ? './tiles' : `${basePath}/tiles`;
+                const tileDir = isLocalhost ? './tiles' : './tiles';
                 tilejsonUrl = `${tileDir}/tilejson.json`;
-                console.log("Using GitHub Pages/local for tilejson:", tilejsonUrl);
+                console.log("Using local for tilejson:", tilejsonUrl);
             }
             
             console.log('Loading tile metadata from:', tilejsonUrl);

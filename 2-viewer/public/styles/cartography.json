@@ -1352,7 +1352,6 @@
       "source": "buildings-tiles",
       "source-layer": "building",
       "minzoom": 11,
-      "maxzoom": 14,
       "layout": {
         "visibility": "visible"
       },
@@ -1587,10 +1586,13 @@
           9,
           0.3,
           12.5,
-          0
+          0.1,
+          14,
+          0.05,
+          16,
+          0.02
         ]
-      },
-      "maxzoom": 13
+      }
     },
     {
       "id": "infrastructure",
@@ -1632,7 +1634,6 @@
       "source": "esri",
       "source-layer": "Admin0 forest or park",
       "minzoom": 11,
-      "maxzoom": 13,
       "layout": {
         "visibility": "none"
       },
@@ -1653,7 +1654,6 @@
       "source": "esri",
       "source-layer": "Admin1 forest or park",
       "minzoom": 11,
-      "maxzoom": 14,
       "layout": {
         "visibility": "none"
       },
@@ -1733,7 +1733,6 @@
       "source": "health-zones-tiles",
       "source-layer": "health-zones",
       "minzoom": 8,
-      "maxzoom": 16,
       "layout": {
         "visibility": "none"
       },
@@ -1865,7 +1864,6 @@
       "source": "health-zones-centroids-tiles",
       "source-layer": "health-zones-centroids",
       "minzoom": 5,
-      "maxzoom": 12,
       "layout": {
         "visibility": "visible",
         "text-field": ["get", "zonesante"],
