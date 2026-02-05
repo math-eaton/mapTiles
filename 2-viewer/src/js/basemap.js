@@ -17,7 +17,7 @@ async function initContours() {
         demSource = new mlcontour.DemSource({
             url: "https://elevation-tiles-prod.s3.amazonaws.com/terrarium/{z}/{x}/{y}.png",
             encoding: "terrarium", // "mapbox" or "terrarium" default="terrarium"
-            maxzoom: 13,
+            maxzoom: 14,
             worker: true, // offload isoline computation to a web worker to reduce jank
             cacheSize: 100, // number of most-recent tiles to cache
             timeoutMs: 10_000, // timeout on fetch requests
@@ -35,8 +35,8 @@ class OvertureMap {
             bounds: null,
             center: null,
             zoom: 8,
-            minZoom: 7,
-            maxZoom: 16,
+            minZoom: 6,
+            maxZoom: 14,
             showTileBoundaries: false,
             clampToBounds: false,
             useVectorTiles: false, // Set to true to use traditional vector tiles instead of PMTiles
@@ -234,8 +234,8 @@ class OvertureMap {
             
             // Only update zoom levels from tilejson if not explicitly set in options
             // Check if values are still defaults (not overridden by user)
-            const defaultMinZoom = 7;
-            const defaultMaxZoom = 16;
+            const defaultMinZoom = 6;
+            const defaultMaxZoom = 14;
             
             if (this.tileMetadata.minzoom !== undefined && this.options.minZoom === defaultMinZoom) {
                 this.options.minZoom = this.tileMetadata.minzoom;
