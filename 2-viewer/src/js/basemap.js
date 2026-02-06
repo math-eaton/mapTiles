@@ -17,7 +17,7 @@ async function initContours() {
         demSource = new mlcontour.DemSource({
             url: "https://elevation-tiles-prod.s3.amazonaws.com/terrarium/{z}/{x}/{y}.png",
             encoding: "terrarium", // "mapbox" or "terrarium" default="terrarium"
-            maxzoom: 13.95,
+            maxzoom: 16,
             worker: true, // offload isoline computation to a web worker to reduce jank
             cacheSize: 100, // number of most-recent tiles to cache
             timeoutMs: 10_000, // timeout on fetch requests
@@ -36,7 +36,7 @@ class OvertureMap {
             center: null,
             zoom: 8,
             minZoom: 6,
-            maxZoom: 14,
+            maxZoom: 22, // Allow zooming beyond tiles' native maxzoom (enables overzooming)
             showTileBoundaries: false,
             clampToBounds: false,
             useVectorTiles: false, // Set to true to use traditional vector tiles instead of PMTiles
@@ -232,18 +232,19 @@ class OvertureMap {
                 console.log('Center calculated:', this.options.center);
             }
             
-            // Only update zoom levels from tilejson if not explicitly set in options
-            // Check if values are still defaults (not overridden by user)
+            // Only update minZoom from tilejson if not explicitly set in options
+            // DON'T override maxZoom from tilejson - we want to allow zooming beyond tiles' native maxzoom
+            // This enables overzooming: map maxZoom (22) > tiles native maxzoom (13-14)
             const defaultMinZoom = 6;
-            const defaultMaxZoom = 13.95;
             
             if (this.tileMetadata.minzoom !== undefined && this.options.minZoom === defaultMinZoom) {
                 this.options.minZoom = this.tileMetadata.minzoom;
                 console.log('MinZoom set from tilejson:', this.options.minZoom);
             }
-            if (this.tileMetadata.maxzoom !== undefined && this.options.maxZoom === defaultMaxZoom) {
-                this.options.maxZoom = this.tileMetadata.maxzoom;
-                console.log('MaxZoom set from tilejson:', this.options.maxZoom);
+            // Map maxZoom stays at 22 (or user override) to enable overzooming
+            console.log('Map maxZoom:', this.options.maxZoom, '(allows overzooming beyond tiles native maxzoom)');
+            if (this.tileMetadata.maxzoom !== undefined) {
+                console.log('Tiles native maxzoom:', this.tileMetadata.maxzoom, '(will overzoom from this level)');
             }
             
         } catch (error) {
@@ -910,7 +911,7 @@ class OvertureMap {
             type: "raster-dem",
             encoding: "terrarium",
             tiles: [demSource.sharedDemProtocolUrl], // share cached DEM tiles with contour layer
-            maxzoom: 13.95,
+            maxzoom: 16,
             tileSize: 256
         };
         

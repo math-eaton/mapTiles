@@ -165,9 +165,15 @@ export default {
         return cacheableResponse(JSON.stringify(t), cacheableHeaders, 200);
       }
 
-      if (tile[0] < pHeader.minZoom || tile[0] > pHeader.maxZoom) {
+      // Handle zoom level constraints with overzoom support
+      if (tile[0] < pHeader.minZoom) {
+        // Below minimum zoom - return 404
         return cacheableResponse(undefined, cacheableHeaders, 404);
       }
+      
+      // If requested zoom is beyond maxZoom, clamp to maxZoom (overzoom)
+      // This allows the client to reuse tiles from the highest available zoom level
+      const actualZoom = Math.min(tile[0], pHeader.maxZoom);
 
       for (const pair of [
         [TileType.Mvt, "mvt"],
@@ -189,7 +195,20 @@ export default {
         }
       }
 
-      const tiledata = await p.getZxy(tile[0], tile[1], tile[2]);
+      // Calculate tile coordinates for overzooming
+      // If requested zoom > maxZoom, we need to fetch the parent tile at maxZoom
+      let fetchZ = actualZoom;
+      let fetchX = tile[1];
+      let fetchY = tile[2];
+      
+      if (tile[0] > pHeader.maxZoom) {
+        // Calculate parent tile coordinates by right-shifting by the zoom difference
+        const zoomDiff = tile[0] - pHeader.maxZoom;
+        fetchX = Math.floor(tile[1] / Math.pow(2, zoomDiff));
+        fetchY = Math.floor(tile[2] / Math.pow(2, zoomDiff));
+      }
+
+      const tiledata = await p.getZxy(fetchZ, fetchX, fetchY);
 
       switch (pHeader.tileType) {
         case TileType.Mvt:
