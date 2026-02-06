@@ -9,83 +9,103 @@
   "sources": {
     "addresses-tiles": {
       "type": "vector",
-      "url": "pmtiles://tiles/addresses.pmtiles"
+      "url": "pmtiles://tiles/addresses.pmtiles",
+      "maxzoom": 22
     },
     "base-tiles": {
       "type": "vector",
-      "url": "pmtiles://tiles/base.pmtiles"
+      "url": "pmtiles://tiles/base.pmtiles",
+      "maxzoom": 22
     },
     "buildings-tiles": {
       "type": "vector",
-      "url": "pmtiles://tiles/buildings.pmtiles"
+      "url": "pmtiles://tiles/buildings.pmtiles",
+      "maxzoom": 22
     },
     "infrastructure-tiles": {
       "type": "vector",
-      "url": "pmtiles://tiles/base.pmtiles"
+      "url": "pmtiles://tiles/base.pmtiles",
+      "maxzoom": 22
     },
     "land-tiles": {
       "type": "vector",
-      "url": "pmtiles://tiles/base.pmtiles"
+      "url": "pmtiles://tiles/base.pmtiles",
+      "maxzoom": 22
     },
     "land-cover-tiles": {
       "type": "vector",
-      "url": "pmtiles://tiles/base.pmtiles"
+      "url": "pmtiles://tiles/base.pmtiles",
+      "maxzoom": 22
     },
     "land-residential-tiles": {
       "type": "vector",
-      "url": "pmtiles://tiles/base.pmtiles"
+      "url": "pmtiles://tiles/base.pmtiles",
+      "maxzoom": 22
     },
     "land-use-tiles": {
       "type": "vector",
-      "url": "pmtiles://tiles/base.pmtiles"
+      "url": "pmtiles://tiles/base.pmtiles",
+      "maxzoom": 22
     },
     "placenames-tiles": {
       "type": "vector",
-      "url": "pmtiles://tiles/base.pmtiles"
+      "url": "pmtiles://tiles/base.pmtiles",
+      "maxzoom": 22
     },
     "places-tiles": {
       "type": "vector",
-      "url": "pmtiles://tiles/places.pmtiles"
+      "url": "pmtiles://tiles/places.pmtiles",
+      "maxzoom": 22
     },
     "settlement-names-tiles": {
       "type": "vector",
-      "url": "pmtiles://tiles/base.pmtiles"
+      "url": "pmtiles://tiles/base.pmtiles",
+      "maxzoom": 22
     },
     "roads-tiles": {
       "type": "vector",
-      "url": "pmtiles://tiles/transportation.pmtiles"
+      "url": "pmtiles://tiles/transportation.pmtiles",
+      "maxzoom": 22
     },
     "water-tiles": {
       "type": "vector",
-      "url": "pmtiles://tiles/base.pmtiles"
+      "url": "pmtiles://tiles/base.pmtiles",
+      "maxzoom": 22
     },
     "water-centerlines-tiles": {
       "type": "vector",
-      "url": "pmtiles://tiles/base.pmtiles"
+      "url": "pmtiles://tiles/base.pmtiles",
+      "maxzoom": 22
     },
     "settlement-extents-tiles": {
       "type": "vector",
-      "url": "pmtiles://tiles/base.pmtiles"
+      "url": "pmtiles://tiles/base.pmtiles",
+      "maxzoom": 22
     },
     "health-facilities-tiles": {
       "type": "vector",
-      "url": "pmtiles://tiles/base.pmtiles"
+      "url": "pmtiles://tiles/base.pmtiles",
+      "maxzoom": 22
     },
     "health-zones-tiles": {
       "type": "vector",
-      "url": "pmtiles://tiles/divisions.pmtiles"
+      "url": "pmtiles://tiles/divisions.pmtiles",
+      "maxzoom": 22
     },
     "health-zones-centroids-tiles": {
       "type": "vector",
-      "url": "pmtiles://tiles/divisions.pmtiles"
+      "url": "pmtiles://tiles/divisions.pmtiles",
+      "maxzoom": 22
     },
     "health-areas-tiles": {
       "type": "vector",
-      "url": "pmtiles://tiles/divisions.pmtiles"
+      "url": "pmtiles://tiles/divisions.pmtiles",
+      "maxzoom": 22
     },
     "health-areas-centroids-tiles": {
       "type": "vector",
-      "url": "pmtiles://tiles/divisions.pmtiles"
+      "url": "pmtiles://tiles/divisions.pmtiles",
+      "maxzoom": 22
     },
     "esri": {
       "type": "vector",

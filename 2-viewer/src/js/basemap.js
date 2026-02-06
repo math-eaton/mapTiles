@@ -452,6 +452,11 @@ class OvertureMap {
                     source.url = newUrl;
                 }
                 
+                // if no maxzoom is set in stylesheet, set to 22 to allow overzooming
+                if (!source.maxzoom) {
+                    source.maxzoom = 22; // Allow overzooming up to z22 (MapLibre default is 22)
+                }
+                
                 // Mark as optional to suppress errors for missing tiles
                 source.optional = true;
             }
