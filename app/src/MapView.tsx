@@ -23,10 +23,9 @@ import type {
 } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import type { LayerSpecification } from "@maplibre/maplibre-gl-style-spec";
-import { FileSource, PMTiles, Protocol } from "pmtiles";
+import { PMTiles, Protocol } from "pmtiles";
 import {
   For,
-  type JSX,
   Show,
   createEffect,
   createMemo,
@@ -34,14 +33,9 @@ import {
   onMount,
 } from "solid-js";
 import { type Flavor, layers, namedFlavor } from "../../styles/src/index.ts";
-import { language_script_pairs } from "../../styles/src/language.ts";
-// import Nav from "./Nav";
 import {
   VERSION_COMPATIBILITY,
-  createHash,
   isValidPMTiles,
-  layersForVersion,
-  parseHash,
 } from "./utils";
 
 const STYLE_MAJOR_VERSION = 5;
@@ -124,37 +118,21 @@ const FeaturesProperties = (props: { features: MapGeoJSONFeature[] }) => {
 };
 
 function getMaplibreStyle(
-  lang: string,
-  localSprites: boolean,
-  flavorName?: string,
-  flavor?: Flavor,
-  tiles?: string,
-  npmLayers?: LayerSpecification[],
-  droppedArchive?: PMTiles,
+  tiles: string,
+  flavor: Flavor,
+  flavorName: string,
 ): StyleSpecification {
   const style = {
     version: 8 as unknown,
     sources: {},
     layers: [],
   } as StyleSpecification;
-  if (!tiles) return style;
-  if (!flavor) return style;
-  let tilesWithProtocol: string;
-  if (droppedArchive) {
-    tilesWithProtocol = `pmtiles://${droppedArchive.source.getKey()}`;
-  } else if (isValidPMTiles(tiles)) {
-    tilesWithProtocol = `pmtiles://${tiles}`;
-  } else {
-    tilesWithProtocol = tiles;
-  }
-  style.layers = [];
 
-  if (localSprites) {
-    style.sprite = `${location.protocol}//${location.host}/${flavorName}`;
-  } else {
-    style.sprite = `https://protomaps.github.io/basemaps-assets/sprites/v4/${flavorName}`;
-  }
+  const tilesWithProtocol = isValidPMTiles(tiles)
+    ? `pmtiles://${tiles}`
+    : tiles;
 
+  style.sprite = `https://protomaps.github.io/basemaps-assets/sprites/v4/${flavorName}`;
   style.glyphs =
     "https://protomaps.github.io/basemaps-assets/fonts/{fontstack}/{range}.pbf";
 
@@ -166,29 +144,14 @@ function getMaplibreStyle(
     },
   };
 
-  if (npmLayers && npmLayers.length > 0) {
-    style.layers = style.layers.concat(npmLayers);
-  } else {
-    style.layers = style.layers.concat(
-      layers("protomaps", flavor, { lang: lang }),
-    );
-  }
+  style.layers = layers("protomaps", flavor, { lang: "en" });
   return style;
 }
 
-type MapLibreViewRef = { fit: () => void };
-
 function MapLibreView(props: {
-  flavorName?: string;
-  flavor?: Flavor;
-  lang: string;
-  localSprites: boolean;
-  showBoxes: boolean;
-  tiles?: string;
-  npmLayers: LayerSpecification[];
-  npmVersion?: string;
-  droppedArchive?: PMTiles;
-  ref?: (ref: MapLibreViewRef) => void;
+  tiles: string;
+  flavor: Flavor;
+  flavorName: string;
 }) {
   let mapContainer: HTMLDivElement | undefined;
   let mapRef: MaplibreMap | undefined;
@@ -202,8 +165,6 @@ function MapLibreView(props: {
   const [mismatch, setMismatch] = createSignal<string>("");
 
   onMount(() => {
-    props.ref?.({ fit });
-
     if (getRTLTextPluginStatus() === "unavailable") {
       setRTLTextPlugin(
         "https://unpkg.com/@mapbox/mapbox-gl-rtl-text@0.2.3/mapbox-gl-rtl-text.min.js",
@@ -223,7 +184,7 @@ function MapLibreView(props: {
     const map = new MaplibreMap({
       hash: "map",
       container: mapContainer,
-      style: getMaplibreStyle("en", false, props.flavorName, props.flavor),
+      style: getMaplibreStyle(props.tiles, props.flavor, props.flavorName),
       attributionControl: false,
     });
 
@@ -336,92 +297,47 @@ function MapLibreView(props: {
     };
   });
 
-  // ensure the dropped archive is first added to the protocol
   const archiveInfo = async (): Promise<
     { metadata: unknown; bounds: LngLatBoundsLike } | undefined
   > => {
-    if (!props.droppedArchive && props.tiles?.endsWith(".json")) {
-      const resp = await fetch(props.tiles);
-      const tileJson = await resp.json();
+    const p = protocolRef();
+    if (p && props.tiles) {
+      let archive = p.tiles.get(props.tiles);
+      if (!archive) {
+        archive = new PMTiles(props.tiles);
+        p.add(archive);
+      }
+      const metadata = await archive.getMetadata();
+      const header = await archive.getHeader();
       return {
-        metadata: tileJson,
+        metadata: metadata,
         bounds: [
-          [tileJson.bounds[0], tileJson.bounds[1]],
-          [tileJson.bounds[2], tileJson.bounds[3]],
+          [header.minLon, header.minLat],
+          [header.maxLon, header.maxLat],
         ],
       };
-    }
-
-    const p = protocolRef();
-    if (p) {
-      let archive = props.droppedArchive;
-      if (archive) {
-        p.add(archive);
-      } else if (props.tiles) {
-        archive = p.tiles.get(props.tiles);
-        if (!archive) {
-          archive = new PMTiles(props.tiles);
-          p.add(archive);
-        }
-      }
-      if (archive) {
-        const metadata = await archive.getMetadata();
-        const header = await archive.getHeader();
-        return {
-          metadata: metadata,
-          bounds: [
-            [header.minLon, header.minLat],
-            [header.maxLon, header.maxLat],
-          ],
-        };
-      }
-    }
-  };
-
-  const fit = async () => {
-    const bounds = (await archiveInfo())?.bounds;
-    if (bounds) {
-      mapRef?.fitBounds(bounds, { animate: false });
     }
   };
 
   const memoizedStyle = createMemo(() => {
-    return getMaplibreStyle(
-      props.lang,
-      props.localSprites,
-      props.flavorName,
-      props.flavor,
-      props.tiles,
-      props.npmLayers,
-      props.droppedArchive,
-    );
+    return getMaplibreStyle(props.tiles, props.flavor, props.flavorName);
   });
 
   createEffect(() => {
-    const styleMajorVersion = props.npmVersion
-      ? +props.npmVersion.split(".")[0]
-      : STYLE_MAJOR_VERSION;
     archiveInfo().then((i) => {
       if (i && i.metadata instanceof Object && "version" in i.metadata) {
         const tilesetVersion = +(i.metadata.version as string).split(".")[0];
         if (
-          VERSION_COMPATIBILITY[tilesetVersion].indexOf(styleMajorVersion) < 0
+          VERSION_COMPATIBILITY[tilesetVersion].indexOf(STYLE_MAJOR_VERSION) < 0
         ) {
           setMismatch(
-            `style v${styleMajorVersion} may not be compatible with tileset v${tilesetVersion}. `,
+            `style v${STYLE_MAJOR_VERSION} may not be compatible with tileset v${tilesetVersion}. `,
           );
         } else {
           setMismatch("");
         }
       }
     });
-  });
-
-  createEffect(() => {
-    if (mapRef) {
-      mapRef.showTileBoundaries = props.showBoxes;
-      mapRef.showCollisionBoxes = props.showBoxes;
-    }
   });
 
   createEffect(() => {
@@ -458,104 +374,16 @@ function MapLibreView(props: {
 }
 
 function MapView() {
-  const hash = parseHash(location.hash);
-  const [flavorName, setFlavorName] = createSignal<string>(
-    hash.flavorName || "light",
-  );
-  const [lang, setLang] = createSignal<string>(hash.lang || "en");
-  const [tiles, setTiles] = createSignal<string>(hash.tiles || DEFAULT_TILES);
-  const [localSprites, setLocalSprites] = createSignal<boolean>(
-    hash.local_sprites === "true",
-  );
-  const [showBoxes, setShowBoxes] = createSignal<boolean>(
-    hash.show_boxes === "true",
-  );
-  const [showStyleJson, setShowStyleJson] = createSignal<boolean>(false);
-  const [publishedStyleVersion, setPublishedStyleVersion] = createSignal<
-    string | undefined
-  >(hash.npm_version);
-  const [knownNpmVersions, setKnownNpmVersions] = createSignal<string[]>([]);
-  const [npmLayers, setNpmLayers] = createSignal<LayerSpecification[]>([]);
-  const [droppedArchive, setDroppedArchive] = createSignal<PMTiles>();
-  const [maplibreView, setMaplibreView] = createSignal<MapLibreViewRef>();
-
-  createEffect(() => {
-    const record = {
-      flavorName: flavorName(),
-      lang: lang(),
-      tiles: droppedArchive()
-        ? undefined
-        : tiles() === DEFAULT_TILES
-          ? undefined
-          : tiles(),
-      local_sprites: localSprites() ? "true" : undefined,
-      show_boxes: showBoxes() ? "true" : undefined,
-      npm_version: publishedStyleVersion()
-        ? publishedStyleVersion()
-        : undefined,
-    };
-    location.hash = createHash(location.hash, record);
-  });
-
-  const flavor = (): Flavor => {
-    return namedFlavor(flavorName());
-  };
-
-  const drop: JSX.EventHandler<HTMLDivElement, DragEvent> = (event) => {
-    event.preventDefault();
-    if (event.dataTransfer) {
-      setDroppedArchive(
-        new PMTiles(new FileSource(event.dataTransfer.files[0])),
-      );
-    }
-  };
-
-  const dragover: JSX.EventHandler<HTMLDivElement, Event> = (event) => {
-    event.preventDefault();
-    return false;
-  };
-
-  const handleKeyPress: JSX.EventHandler<HTMLDivElement, KeyboardEvent> = (
-    event,
-  ) => {
-    const c = event.charCode;
-    if (c >= 49 && c <= 53) {
-      setFlavorName(["light", "dark", "white", "grayscale", "black"][c - 49]);
-    }
-  };
-
-  createEffect(() => {
-    (async () => {
-      const psv = publishedStyleVersion();
-      if (psv === undefined || psv === "") {
-        setNpmLayers([]);
-      } else {
-        setNpmLayers(await layersForVersion(psv, flavorName()));
-      }
-    })();
-  });
-
-  language_script_pairs.sort((a, b) => a.full_name.localeCompare(b.full_name));
+  const FLAVOR = "light";
+  const flavor = namedFlavor(FLAVOR);
 
   return (
     <div class="flex flex-col h-dvh w-full">
-      <div
-        class="h-full flex grow-1"
-        onKeyPress={handleKeyPress}
-        ondragover={dragover}
-        ondrop={drop}
-      >
+      <div class="h-full flex grow-1">
         <MapLibreView
-          ref={setMaplibreView}
-          tiles={tiles()}
-          localSprites={localSprites()}
-          showBoxes={showBoxes()}
-          flavorName={flavorName()}
-          flavor={flavor()}
-          lang={lang()}
-          npmLayers={npmLayers()}
-          npmVersion={publishedStyleVersion()}
-          droppedArchive={droppedArchive()}
+          tiles={DEFAULT_TILES}
+          flavor={flavor}
+          flavorName={FLAVOR}
         />
       </div>
     </div>
