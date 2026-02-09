@@ -33,16 +33,10 @@ import {
   onMount,
 } from "solid-js";
 import { type Flavor, layers, namedFlavor } from "../../styles/src/index.ts";
-import {
-  VERSION_COMPATIBILITY,
-  isValidPMTiles,
-} from "./utils";
-import { getTileSourceConfig, logConfig, TILE_CONFIG } from "./config";
+import { VERSION_COMPATIBILITY } from "./utils";
+import { APP_CONFIG, getTileSourceConfig, logConfig } from "./config";
 
 const STYLE_MAJOR_VERSION = 5;
-
-const ATTRIBUTION =
-  '<a href="https://github.com/protomaps/basemaps">Protomaps</a> © <a href="https://openstreetmap.org">OpenStreetMap</a>';
 
 function getSourceLayer(l: LayerSpecification): string {
   if ("source-layer" in l && l["source-layer"]) {
@@ -182,7 +176,7 @@ function MapLibreView(props: {
 
     // Only register pmtiles protocol if not using Cloudflare Worker
     // (Cloudflare Worker serves tiles directly, doesn't need the protocol)
-    if (!TILE_CONFIG.useCloudflare) {
+    if (!APP_CONFIG.tiles.useCloudflare) {
       const protocol = new Protocol({ metadata: true });
       setProtocolRef(protocol);
       addProtocol("pmtiles", protocol.tile);
@@ -299,7 +293,7 @@ function MapLibreView(props: {
 
     return () => {
       // Only remove protocol if it was registered (not using Cloudflare Worker)
-      if (!TILE_CONFIG.useCloudflare) {
+      if (!APP_CONFIG.tiles.useCloudflare) {
         setProtocolRef(undefined);
         removeProtocol("pmtiles");
       }
@@ -312,17 +306,17 @@ function MapLibreView(props: {
   > => {
     // When using Cloudflare Worker, we can't easily get metadata
     // In that case, return undefined (map will use default bounds/center)
-    if (TILE_CONFIG.useCloudflare) {
+    if (APP_CONFIG.tiles.useCloudflare) {
       console.log("Using Cloudflare Worker - metadata not available");
       return undefined;
     }
 
     // For direct PMTiles, fetch metadata via protocol
     const p = protocolRef();
-    if (p && TILE_CONFIG.directPMTilesUrl) {
-      let archive = p.tiles.get(TILE_CONFIG.directPMTilesUrl);
+    if (p && APP_CONFIG.tiles.directPMTilesUrl) {
+      let archive = p.tiles.get(APP_CONFIG.tiles.directPMTilesUrl);
       if (!archive) {
-        archive = new PMTiles(TILE_CONFIG.directPMTilesUrl);
+        archive = new PMTiles(APP_CONFIG.tiles.directPMTilesUrl);
         p.add(archive);
       }
       const metadata = await archive.getMetadata();
