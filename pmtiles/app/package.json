@@ -5,7 +5,7 @@
 	"type": "module",
 	"scripts": {
 		"dev": "vite",
-		"build": "tsc -b && vite build",
+		"build": "cd ../styles && npm ci && cd ../app && tsc -b && vite build",
 		"preview": "vite preview",
 		"test": "vitest",
 		"check": "biome check src test --javascript-formatter-indent-style=space --json-formatter-indent-style=space",
