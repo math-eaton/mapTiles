@@ -32,60 +32,66 @@
  * - No egress fees from R2 (unlike direct R2 access)
  */
 
+export interface AssetConfig {
+  spriteBaseUrl: string;
+}
+
 export interface TileConfig {
-  // Set to true to use Cloudflare Worker, false for direct PMTiles
   useCloudflare: boolean;
-  
-  // Your Cloudflare Worker URL (only needed if useCloudflare = true)
-  // Example: "https://tiles.yourname.workers.dev"
   cloudflareWorkerUrl: string;
-  
-  // The name of your PMTiles archive (without .pmtiles extension)
-  // This should match the filename in your R2 bucket
   archiveName: string;
-  
-  // Direct R2 URL (only needed if useCloudflare = false)
-  // Example: "https://pub-xyz.r2.dev/planet.pmtiles"
   directPMTilesUrl: string;
 }
 
-// ============================================================================
-// CONFIGURATION - Update these values for your deployment
-// ============================================================================
+export interface AppConfig {
+  tiles: TileConfig;
+  assets: AssetConfig;
+}
 
-export const TILE_CONFIG: TileConfig = {
-  // PRODUCTION: Set to true and configure cloudflareWorkerUrl
-  // DEVELOPMENT: Set to false and use directPMTilesUrl
-  useCloudflare: true,
-  
-  // Your Cloudflare Worker URL (update this after deploying your worker)
-  // Leave empty if using direct PMTiles
-  // NOTE: No trailing slash!
-  cloudflareWorkerUrl: "https://pmtiles-cloudflare.mheaton-945.workers.dev",
-  
-  // Your PMTiles archive name (without .pmtiles extension)
-  archiveName: "global",
-  
-  // Direct R2 URL - fallback for development or if not using Cloudflare Worker
-  directPMTilesUrl: "https://pub-927f42809d2e4b89b96d1e7efb091d1f.r2.dev/global.pmtiles",
+// Environment variable support for Cloudflare Pages
+const getEnvVar = (key: string, defaultValue: string = ""): string => {
+  // Vite exposes env vars prefixed with VITE_ at build time
+  return import.meta.env[key] || defaultValue;
+};
+
+export const APP_CONFIG: AppConfig = {
+  tiles: {
+    useCloudflare: getEnvVar("VITE_USE_CLOUDFLARE", "true") === "true",
+    cloudflareWorkerUrl: getEnvVar(
+      "VITE_CLOUDFLARE_WORKER_URL",
+      "https://pmtiles-cloudflare.mheaton-945.workers.dev"
+    ),
+    archiveName: getEnvVar("VITE_BASELAYER_NAME", "global"),
+    directPMTilesUrl: getEnvVar(
+      "VITE_BASELAYER_URL",
+      "https://pub-927f42809d2e4b89b96d1e7efb091d1f.r2.dev/global.pmtiles"
+    ),
+  },
+  assets: {
+    // R2-hosted sprites (use Protomaps default if not set)
+    spriteBaseUrl: getEnvVar(
+      "VITE_SPRITE_BASE_URL",
+      "https://protomaps.github.io/basemaps-assets/sprites/v4"
+    ),
+  },
 };
 
 // ============================================================================
-// Helper Functions - No need to modify below this line
+// Helper Functions
 // ============================================================================
-
 /**
  * Get the tile source configuration for MapLibre
  * Returns either a 'url' (for pmtiles protocol) or 'tiles' array (for Cloudflare Worker)
  */
 export function getTileSourceConfig(): { url?: string; tiles?: string[]; attribution: string } {
   const attribution = '<a href="https://github.com/protomaps/basemaps">Protomaps</a> © <a href="https://openstreetmap.org">OpenStreetMap</a>';
+  const config = APP_CONFIG.tiles;
   
-  if (TILE_CONFIG.useCloudflare) {
-    if (!TILE_CONFIG.cloudflareWorkerUrl) {
+  if (config.useCloudflare) {
+    if (!config.cloudflareWorkerUrl) {
       console.error("Cloudflare Worker URL not configured! Falling back to direct PMTiles.");
       return {
-        url: `pmtiles://${TILE_CONFIG.directPMTilesUrl}`,
+        url: `pmtiles://${config.directPMTilesUrl}`,
         attribution,
       };
     }
@@ -93,13 +99,13 @@ export function getTileSourceConfig(): { url?: string; tiles?: string[]; attribu
     // Cloudflare Worker pattern: {worker-url}/{archive-name}/{z}/{x}/{y}.mvt
     // The worker maps {name} to {name}.pmtiles in your R2 bucket
     return {
-      tiles: [`${TILE_CONFIG.cloudflareWorkerUrl}/${TILE_CONFIG.archiveName}/{z}/{x}/{y}.mvt`],
+      tiles: [`${config.cloudflareWorkerUrl}/${config.archiveName}/{z}/{x}/{y}.mvt`],
       attribution,
     };
   } else {
     // Direct PMTiles via protocol
     return {
-      url: `pmtiles://${TILE_CONFIG.directPMTilesUrl}`,
+      url: `pmtiles://${config.directPMTilesUrl}`,
       attribution,
     };
   }
@@ -110,16 +116,17 @@ export function getTileSourceConfig(): { url?: string; tiles?: string[]; attribu
  */
 export function validateConfig(): { valid: boolean; errors: string[] } {
   const errors: string[] = [];
+  const config = APP_CONFIG.tiles;
   
-  if (TILE_CONFIG.useCloudflare) {
-    if (!TILE_CONFIG.cloudflareWorkerUrl) {
+  if (config.useCloudflare) {
+    if (!config.cloudflareWorkerUrl) {
       errors.push("Cloudflare Worker URL is required when useCloudflare is true");
     }
-    if (!TILE_CONFIG.archiveName) {
+    if (!config.archiveName) {
       errors.push("Archive name is required");
     }
   } else {
-    if (!TILE_CONFIG.directPMTilesUrl) {
+    if (!config.directPMTilesUrl) {
       errors.push("Direct PMTiles URL is required when useCloudflare is false");
     }
   }
@@ -134,16 +141,18 @@ export function validateConfig(): { valid: boolean; errors: string[] } {
  * Log the current configuration (for debugging)
  */
 export function logConfig(): void {
-  const config = getTileSourceConfig();
+  const tileSource = getTileSourceConfig();
+  const config = APP_CONFIG.tiles;
   console.log("=== Tile Configuration ===");
-  console.log("Mode:", TILE_CONFIG.useCloudflare ? "Cloudflare Worker" : "Direct PMTiles");
-  console.log("Archive:", TILE_CONFIG.archiveName);
+  console.log("Mode:", config.useCloudflare ? "Cloudflare Worker" : "Direct PMTiles");
+  console.log("Archive:", config.archiveName);
+  console.log("Sprite Base URL:", APP_CONFIG.assets.spriteBaseUrl);
   
-  if (config.url) {
-    console.log("PMTiles URL:", config.url);
+  if (tileSource.url) {
+    console.log("PMTiles URL:", tileSource.url);
   }
-  if (config.tiles) {
-    console.log("Tile Pattern:", config.tiles[0]);
+  if (tileSource.tiles) {
+    console.log("Tile Pattern:", tileSource.tiles[0]);
   }
   
   const validation = validateConfig();

@@ -40,7 +40,6 @@ export default defineConfig({
 			input: {
 				mapview: resolve(__dirname, "index.html"),
 				builds: resolve(__dirname, "builds/index.html"),
-				visualtests: resolve(__dirname, "visualtests/index.html"),
 			},
 		},
 	},
