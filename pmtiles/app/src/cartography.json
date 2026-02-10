@@ -4,7 +4,7 @@
         "protomaps": {
             "type": "vector",
             "attribution": "<a href=\"https://github.com/protomaps/basemaps\">Protomaps</a> © <a href=\"https://openstreetmap.org\">OpenStreetMap</a>",
-            "url": "pmtiles://https://demo-bucket.protomaps.com/v4.pmtiles"
+            "url": "pmtiles://https://pub-927f42809d2e4b89b96d1e7efb091d1f.r2.dev/global.pmtiles"
         }
     },
     "layers": [
@@ -404,7 +404,7 @@
             "source": "protomaps",
             "source-layer": "water",
             "paint": {
-                "fill-color": "#80deea"
+                "fill-color": "#A4DBE8"
             }
         },
         {
@@ -419,7 +419,7 @@
                 "stream"
             ],
             "paint": {
-                "line-color": "#80deea",
+                "line-color": "#A4DBE8",
                 "line-width": 0.5
             }
         },
@@ -452,6 +452,80 @@
                     18,
                     12
                 ]
+            }
+        },
+        {
+            "id": "contours",
+            "type": "line",
+            "source": "contours",
+            "source-layer": "contours",
+            "paint": {
+                "line-color": [
+                    "match",
+                    ["get", "level"],
+                    1,
+                    "#8b7355",
+                    0,
+                    "#b3a89d",
+                    "#9d8b7a"
+                ],
+                "line-opacity": [
+                    "interpolate",
+                    ["linear"],
+                    ["zoom"],
+                    10,
+                    0.15,
+                    12,
+                    0.3,
+                    14,
+                    0.5
+                ],
+                "line-width": [
+                    "interpolate",
+                    ["linear"],
+                    ["zoom"],
+                    10,
+                    ["match", ["get", "level"], 1, 0.3, 0.2],
+                    13,
+                    ["match", ["get", "level"], 1, 0.6, 0.4],
+                    16,
+                    ["match", ["get", "level"], 1, 1.0, 0.6]
+                ]
+            },
+            "layout": {
+                "visibility": "visible",
+                "line-join": "round",
+                "line-cap": "round"
+            }
+        },
+        {
+            "id": "contour-text",
+            "type": "symbol",
+            "source": "contours",
+            "source-layer": "contours",
+            "filter": [">", ["get", "level"], 0],
+            "paint": {
+                "text-color": "#8b7355",
+                "text-halo-color": "#ffffff",
+                "text-halo-width": 1.5,
+                "text-opacity": [
+                    "interpolate",
+                    ["linear"],
+                    ["zoom"],
+                    12,
+                    0,
+                    14,
+                    0.4,
+                    16,
+                    0.6
+                ]
+            },
+            "layout": {
+                "symbol-placement": "line",
+                "text-size": 10,
+                "text-field": ["concat", ["number-format", ["get", "ele"], {}], "m"],
+                "text-font": ["Noto Sans Regular"],
+                "visibility": "none"
             }
         },
         {

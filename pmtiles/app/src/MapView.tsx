@@ -3,6 +3,7 @@ import { render } from "solid-js/web";
 import "./index.css";
 import MaplibreInspect from "@maplibre/maplibre-gl-inspect";
 import "@maplibre/maplibre-gl-inspect/dist/maplibre-gl-inspect.css";
+import * as maplibregl from "maplibre-gl";
 import {
   AttributionControl,
   GeolocateControl,
@@ -110,7 +111,7 @@ const FeaturesProperties = (props: { features: MapGeoJSONFeature[] }) => {
   );
 };
 
-function getMaplibreStyle(): StyleSpecification {
+function getMaplibreStyle(demSource: any): StyleSpecification {
   // Start with base style from cartography.json
   const style = JSON.parse(JSON.stringify(baseStyle)) as StyleSpecification;
 
@@ -135,6 +136,32 @@ function getMaplibreStyle(): StyleSpecification {
       ...(buildingsSourceConfig.url ? { url: buildingsSourceConfig.url } : {}),
       ...(buildingsSourceConfig.tiles ? { tiles: buildingsSourceConfig.tiles } : {}),
       maxzoom: 22,
+    },
+    dem: {
+      type: "raster-dem",
+      encoding: "terrarium",
+      tiles: [demSource.sharedDemProtocolUrl],
+      maxzoom: 16,
+      tileSize: 256,
+    },
+    contours: {
+      type: "vector",
+      tiles: [
+        demSource.contourProtocolUrl({
+          multiplier: 1, // Keep meters
+          thresholds: {
+            9: [100, 200],
+            10: [50, 100],
+            11: [20, 100],
+            12: [10, 50],
+            13: [5, 25],
+          },
+          elevationKey: "ele",
+          levelKey: "level",
+          contourLayer: "contours",
+        }),
+      ],
+      maxzoom: 16,
     },
   };
 
@@ -162,7 +189,7 @@ function getMaplibreStyle(): StyleSpecification {
       },
     },
   ];
-  
+
   return style;
 }
 
@@ -178,7 +205,7 @@ function MapLibreView() {
   const [zoom, setZoom] = createSignal<number>(0);
   const [mismatch, setMismatch] = createSignal<string>("");
 
-  onMount(() => {
+  onMount(async () => {
     // Log tile configuration for debugging
     logConfig();
 
@@ -202,18 +229,37 @@ function MapLibreView() {
       addProtocol("pmtiles", protocol.tile);
     }
 
+    // Setup maplibre-contour
+    const mlcontourModule = await import("maplibre-contour");
+    const mlcontour = mlcontourModule.default;
+    
+    // Create DEM source
+    const demSource = new mlcontour.DemSource({
+      url: "https://elevation-tiles-prod.s3.amazonaws.com/terrarium/{z}/{x}/{y}.png",
+      encoding: "terrarium",
+      maxzoom: 16,
+      worker: true,
+      cacheSize: 100,
+      timeoutMs: 10_000,
+    });
+    
+    // Setup maplibre with the DemSource
+    demSource.setupMaplibre(maplibregl);
+
     // clamp to minimize tile calls
     const drcBounds: LngLatBoundsLike = [[8, -13], [35, 9]];
 
+    // Get style with contours
+    const style = getMaplibreStyle(demSource);
 
     const map = new MaplibreMap({
       hash: "map",
       container: mapContainer,
-      style: getMaplibreStyle(),
+      style: style,
       center: [21.5, -4], // Center of DRC 
       zoom: 6, 
       minZoom: 3,
-      maxZoom: 15.5,
+      maxZoom: 15.75,
       maxBounds: drcBounds, // viewport restriction
       attributionControl: false,
       refreshExpiredTiles: false,
@@ -365,8 +411,24 @@ function MapLibreView() {
     }
   };
 
-  const memoizedStyle = createMemo(() => {
-    return getMaplibreStyle();
+  const memoizedStyle = createMemo(async () => {
+    // Lazy load contour module
+    const mlcontourModule = await import("maplibre-contour");
+    const mlcontour = mlcontourModule.default;
+    
+    // Create DEM source
+    const demSource = new mlcontour.DemSource({
+      url: "https://elevation-tiles-prod.s3.amazonaws.com/terrarium/{z}/{x}/{y}.png",
+      encoding: "terrarium",
+      maxzoom: 16,
+      worker: true,
+      cacheSize: 100,
+      timeoutMs: 10_000,
+    });
+    
+    demSource.setupMaplibre(maplibregl);
+    
+    return getMaplibreStyle(demSource);
   });
 
   createEffect(() => {
@@ -388,7 +450,9 @@ function MapLibreView() {
 
   createEffect(() => {
     if (mapRef) {
-      mapRef.setStyle(memoizedStyle());
+      memoizedStyle().then((style) => {
+        mapRef.setStyle(style);
+      });
     }
   });
 
