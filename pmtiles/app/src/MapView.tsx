@@ -450,8 +450,9 @@ function MapLibreView() {
 
   createEffect(() => {
     if (mapRef) {
+      const map = mapRef;
       memoizedStyle().then((style) => {
-        mapRef.setStyle(style);
+        map.setStyle(style);
       });
     }
   });
