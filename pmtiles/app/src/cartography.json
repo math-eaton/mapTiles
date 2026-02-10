@@ -9,8 +9,12 @@
         "overture": {
             "type": "vector",
             "attribution": "<a href=\"https://overturemaps.org\">Overture Maps</a>",
-            "url": "pmtiles://https://pub-927f42809d2e4b89b96d1e7efb091d1f.r2.dev/buildings.pmtiles",
-            "maxzoom": 14
+            "url": "pmtiles://https://pub-927f42809d2e4b89b96d1e7efb091d1f.r2.dev/buildings.pmtiles"
+        },
+        "grid3": {
+            "type": "vector",
+            "attribution": "<a href=\"https://grid3.org\">GRID3</a>",
+            "url": "pmtiles://https://pub-927f42809d2e4b89b96d1e7efb091d1f.r2.dev/buildings.pmtiles"
         }
     },
     "layers": [
@@ -43,27 +47,49 @@
             "paint": {
                 "hillshade-exaggeration": [
                     "interpolate",
-                    ["exponential", 1.5],
-                    ["zoom"],
-                    6, 0.4,
-                    9, 0.2,
-                    15, 0.1
+                    [
+                        "exponential",
+                        1.5
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    6,
+                    0.4,
+                    9,
+                    0.2,
+                    15,
+                    0.1
                 ],
                 "hillshade-shadow-color": [
                     "interpolate",
-                    ["linear"],
-                    ["zoom"],
-                    6, "rgba(0,0,0,0.2)",
-                    11, "rgba(0,0,0,0.05)",
-                    15, "rgba(123, 123, 123, 0)"
+                    [
+                        "linear"
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    6,
+                    "rgba(0,0,0,0.2)",
+                    11,
+                    "rgba(0,0,0,0.05)",
+                    15,
+                    "rgba(123, 123, 123, 0)"
                 ],
                 "hillshade-highlight-color": [
                     "interpolate",
-                    ["linear"],
-                    ["zoom"],
-                    11, "rgba(255,255,255,0.15)",
-                    13, "rgba(255,255,255,0.1)",
-                    16, "rgba(239, 239, 239, 0.05)"
+                    [
+                        "linear"
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    11,
+                    "rgba(255,255,255,0.15)",
+                    13,
+                    "rgba(255,255,255,0.1)",
+                    16,
+                    "rgba(239, 239, 239, 0.05)"
                 ]
             }
         },
@@ -431,7 +457,7 @@
                 "fill-color": "#e9e9ed"
             }
         },
-                {
+        {
             "id": "contours",
             "type": "line",
             "source": "contours",
@@ -439,7 +465,10 @@
             "paint": {
                 "line-color": [
                     "match",
-                    ["get", "level"],
+                    [
+                        "get",
+                        "level"
+                    ],
                     1,
                     "#9d8b7a",
                     0,
@@ -448,8 +477,12 @@
                 ],
                 "line-opacity": [
                     "interpolate",
-                    ["linear"],
-                    ["zoom"],
+                    [
+                        "linear"
+                    ],
+                    [
+                        "zoom"
+                    ],
                     10,
                     0.25,
                     12,
@@ -459,14 +492,45 @@
                 ],
                 "line-width": [
                     "interpolate",
-                    ["linear"],
-                    ["zoom"],
+                    [
+                        "linear"
+                    ],
+                    [
+                        "zoom"
+                    ],
                     10,
-                    ["match", ["get", "level"], 1, 0.3, 0.2],
+                    [
+                        "match",
+                        [
+                            "get",
+                            "level"
+                        ],
+                        1,
+                        0.3,
+                        0.2
+                    ],
                     13,
-                    ["match", ["get", "level"], 1, 0.6, 0.4],
+                    [
+                        "match",
+                        [
+                            "get",
+                            "level"
+                        ],
+                        1,
+                        0.6,
+                        0.4
+                    ],
                     16,
-                    ["match", ["get", "level"], 1, 0.5, 0.5]
+                    [
+                        "match",
+                        [
+                            "get",
+                            "level"
+                        ],
+                        1,
+                        0.5,
+                        0.5
+                    ]
                 ]
             },
             "layout": {
@@ -480,15 +544,26 @@
             "type": "symbol",
             "source": "contours",
             "source-layer": "contours",
-            "filter": [">", ["get", "level"], 0],
+            "filter": [
+                ">",
+                [
+                    "get",
+                    "level"
+                ],
+                0
+            ],
             "paint": {
                 "text-color": "#8b7355",
                 "text-halo-color": "#ffffff",
                 "text-halo-width": 1.5,
                 "text-opacity": [
                     "interpolate",
-                    ["linear"],
-                    ["zoom"],
+                    [
+                        "linear"
+                    ],
+                    [
+                        "zoom"
+                    ],
                     12,
                     0,
                     14,
@@ -500,8 +575,21 @@
             "layout": {
                 "symbol-placement": "line",
                 "text-size": 10,
-                "text-field": ["concat", ["number-format", ["get", "ele"], {}], "m"],
-                "text-font": ["Noto Sans Regular"],
+                "text-field": [
+                    "concat",
+                    [
+                        "number-format",
+                        [
+                            "get",
+                            "ele"
+                        ],
+                        {}
+                    ],
+                    "m"
+                ],
+                "text-font": [
+                    "Noto Sans Regular"
+                ],
                 "visibility": "none"
             }
         },
@@ -532,7 +620,20 @@
             ],
             "paint": {
                 "line-color": "#A4DBE8",
-                "line-width": 0.5
+                "line-width": [
+                    "interpolate",
+                    [
+                        "exponential",
+                        1.6
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    14,
+                    0,
+                    14.5,
+                    0.5
+                ]
             }
         },
         {
@@ -547,7 +648,19 @@
                 "river"
             ],
             "paint": {
-                "line-color": "#80deea",
+                "line-color": [
+                    "interpolate",
+                    [
+                        "linear"
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    8,
+                    "#59CBE8",
+                    13,
+                    "#9ADBE8"
+                ],
                 "line-width": [
                     "interpolate",
                     [
@@ -1068,84 +1181,6 @@
                     5,
                     18,
                     15
-                ]
-            }
-        },
-        {
-            "id": "buildings-flat",
-            "type": "fill",
-            "source": "overture",
-            "source-layer": "building",
-            "minzoom": 11,
-            "maxzoom": 15,
-            "layout": {
-                "visibility": "visible"
-            },
-            "paint": {
-                "fill-color": "#D7B9E4",
-                "fill-opacity": [
-                    "interpolate",
-                    ["linear"],
-                    ["zoom"],
-                    11, 0,
-                    12, 0.4,
-                    13, 0.6,
-                    14, 0.8,
-                    15, 0
-                ]
-            }
-        },
-        {
-            "id": "buildings-extrusion",
-            "type": "fill-extrusion",
-            "source": "overture",
-            "source-layer": "building",
-            "minzoom": 13,
-            "layout": {
-                "visibility": "visible"
-            },
-            "paint": {
-                "fill-extrusion-color": "#d8d8d8",
-                "fill-extrusion-height": ["coalesce", ["get", "height"], 5],
-                "fill-extrusion-base": 0,
-                "fill-extrusion-opacity": [
-                    "interpolate",
-                    ["linear"],
-                    ["zoom"],
-                    13, 0,
-                    14, 0.7,
-                    15, 0.9
-                ]
-            }
-        },
-        {
-            "id": "building-outlines",
-            "type": "line",
-            "source": "overture",
-            "source-layer": "building",
-            "minzoom": 12,
-            "layout": {
-                "visibility": "visible"
-            },
-            "paint": {
-                "line-color": "#9a9a9a",
-                "line-width": [
-                    "interpolate",
-                    ["linear"],
-                    ["zoom"],
-                    11, 0,
-                    12, 0.3,
-                    13, 0.5,
-                    14, 0.7,
-                    16, 1.0
-                ],
-                "line-opacity": [
-                    "interpolate",
-                    ["linear"],
-                    ["zoom"],
-                    11, 0,
-                    12, 0.2,
-                    14, 0.5
                 ]
             }
         },
@@ -1959,6 +1994,126 @@
                             1
                         ]
                     ]
+                ]
+            }
+        },
+        {
+            "id": "buildings-flat",
+            "type": "fill",
+            "source": "overture",
+            "source-layer": "building",
+            "minzoom": 11,
+            "maxzoom": 15,
+            "layout": {
+                "visibility": "visible"
+            },
+            "paint": {
+                "fill-color": "#C98BDB",
+                "fill-opacity": [
+                    "interpolate",
+                    [
+                        "exponential",
+                        1.6
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    11,
+                    0,
+                    12,
+                    0.6,
+                    13,
+                    0.8,
+                    14,
+                    1,
+                    15,
+                    0
+                ]
+            }
+        },
+        {
+            "id": "buildings-extrusion",
+            "type": "fill-extrusion",
+            "source": "overture",
+            "source-layer": "building",
+            "minzoom": 13,
+            "layout": {
+                "visibility": "visible"
+            },
+            "paint": {
+                "fill-extrusion-color": "#E6BEDD",
+                "fill-extrusion-height": [
+                    "coalesce",
+                    [
+                        "get",
+                        "height"
+                    ],
+                    5
+                ],
+                "fill-extrusion-base": 0,
+                "fill-extrusion-opacity": [
+                    "interpolate",
+                    [
+                        "exponential",
+                        1.6
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    13,
+                    0,
+                    14,
+                    0.7,
+                    15,
+                    0.9
+                ]
+            }
+        },
+        {
+            "id": "building-outlines",
+            "type": "line",
+            "source": "overture",
+            "source-layer": "building",
+            "minzoom": 12,
+            "layout": {
+                "visibility": "visible"
+            },
+            "paint": {
+                "line-color": "#9a9a9a",
+                "line-width": [
+                    "interpolate",
+                    [
+                        "exponential",
+                        1.6
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    11,
+                    0,
+                    12,
+                    0.3,
+                    13,
+                    0.5,
+                    14,
+                    0.7,
+                    16,
+                    1.0
+                ],
+                "line-opacity": [
+                    "interpolate",
+                    [
+                        "linear"
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    11,
+                    0,
+                    12,
+                    0.2,
+                    14,
+                    0.5
                 ]
             }
         },

@@ -11,9 +11,7 @@ import {
   Map as MaplibreMap,
   NavigationControl,
   Popup,
-  addProtocol,
   getRTLTextPluginStatus,
-  removeProtocol,
   setRTLTextPlugin,
 } from "maplibre-gl";
 import type {
@@ -24,20 +22,15 @@ import type {
 } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import type { LayerSpecification } from "@maplibre/maplibre-gl-style-spec";
-import { PMTiles, Protocol } from "pmtiles";
 import {
   For,
-  Show,
   createEffect,
   createMemo,
   createSignal,
   onMount,
 } from "solid-js";
-import { VERSION_COMPATIBILITY } from "./utils";
-import { APP_CONFIG, getTileSourceConfig, logConfig } from "./config";
+import { getTileSourceConfig, logConfig } from "./config";
 import baseStyle from "./cartography.json";
-
-const STYLE_MAJOR_VERSION = 5;
 
 function getSourceLayer(l: LayerSpecification): string {
   if ("source-layer" in l && l["source-layer"]) {
@@ -115,31 +108,39 @@ function getMaplibreStyle(demSource: any): StyleSpecification {
   // Start with base style from cartography.json
   const style = JSON.parse(JSON.stringify(baseStyle)) as StyleSpecification;
 
-  // Get tile source configuration (either PMTiles URL or Cloudflare Worker tiles)
-  const tileSourceConfig = getTileSourceConfig();
-  const buildingsSourceConfig = getTileSourceConfig("buildings");
+  // Get tile source configurations from Cloudflare Worker
+  const protomapsConfig = getTileSourceConfig("protomaps");
+  const overtureConfig = getTileSourceConfig("overture");
+  // const grid3Config = getTileSourceConfig("grid3"); // Uncomment when grid3 layers are ready
 
-  // Update the existing sources with dynamic configuration
-  // Following the pattern from data_sandwich.html example
+  // Update the existing sources with Cloudflare Worker tile endpoints
   if (style.sources.protomaps) {
     style.sources.protomaps = {
       type: "vector",
-      attribution: tileSourceConfig.attribution,
-      ...(tileSourceConfig.url ? { url: tileSourceConfig.url } : {}),
-      ...(tileSourceConfig.tiles ? { tiles: tileSourceConfig.tiles } : {}),
-      maxzoom: 22,
+      attribution: protomapsConfig.attribution,
+      tiles: protomapsConfig.tiles,
+      maxzoom: protomapsConfig.maxzoom,
     };
   }
 
   if (style.sources.overture) {
     style.sources.overture = {
       type: "vector",
-      attribution: buildingsSourceConfig.attribution,
-      ...(buildingsSourceConfig.url ? { url: buildingsSourceConfig.url } : {}),
-      ...(buildingsSourceConfig.tiles ? { tiles: buildingsSourceConfig.tiles } : {}),
-      maxzoom: 14,
+      attribution: overtureConfig.attribution,
+      tiles: overtureConfig.tiles,
+      maxzoom: overtureConfig.maxzoom,
     };
   }
+
+  // Add GRID3 source when ready
+  // if (style.sources.grid3) {
+  //   style.sources.grid3 = {
+  //     type: "vector",
+  //     attribution: grid3Config.attribution,
+  //     tiles: grid3Config.tiles,
+  //     maxzoom: grid3Config.maxzoom,
+  //   };
+  // }
 
   // Add DEM and contours sources for terrain
   style.sources.dem = {
@@ -179,10 +180,7 @@ function MapLibreView() {
   let hiddenRef: HTMLDivElement | undefined;
   let longPressTimeout: ReturnType<typeof setTimeout>;
 
-  const [timelinessInfo, setTimelinessInfo] = createSignal<string>();
-  const [protocolRef, setProtocolRef] = createSignal<Protocol | undefined>();
   const [zoom, setZoom] = createSignal<number>(0);
-  const [mismatch, setMismatch] = createSignal<string>("");
 
   onMount(async () => {
     // Log tile configuration for debugging
@@ -200,13 +198,7 @@ function MapLibreView() {
       return;
     }
 
-    // Only register pmtiles protocol if not using Cloudflare Worker
-    // (Cloudflare Worker serves tiles directly, doesn't need the protocol)
-    if (!APP_CONFIG.tiles.useCloudflare) {
-      const protocol = new Protocol({ metadata: true });
-      setProtocolRef(protocol);
-      addProtocol("pmtiles", protocol.tile);
-    }
+    // Using Cloudflare Worker for tile delivery - no PMTiles protocol needed
 
     // Setup maplibre-contour
     const mlcontourModule = await import("maplibre-contour");
@@ -293,17 +285,6 @@ function MapLibreView() {
 
     map.on("idle", () => {
       setZoom(map.getZoom());
-      archiveInfo().then((i) => {
-        if (i?.metadata) {
-          const m = i.metadata as {
-            version?: string;
-            "planetiler:osm:osmosisreplicationtime"?: string;
-          };
-          setTimelinessInfo(
-            `tiles@${m.version} ${m["planetiler:osm:osmosisreplicationtime"]?.substr(0, 10)}`,
-          );
-        }
-      });
     });
 
     const showContextMenu = (e: MapTouchEvent) => {
@@ -350,44 +331,11 @@ function MapLibreView() {
     mapRef = map;
 
     return () => {
-      // Only remove protocol if it was registered (not using Cloudflare Worker)
-      if (!APP_CONFIG.tiles.useCloudflare) {
-        setProtocolRef(undefined);
-        removeProtocol("pmtiles");
-      }
       map.remove();
     };
   });
 
-  const archiveInfo = async (): Promise<
-    { metadata: unknown; bounds: LngLatBoundsLike } | undefined
-  > => {
-    // When using Cloudflare Worker, we can't easily get metadata
-    // In that case, return undefined (map will use default bounds/center)
-    if (APP_CONFIG.tiles.useCloudflare) {
-      // console.log("Using Cloudflare Worker - metadata not available");
-      return undefined;
-    }
 
-    // For direct PMTiles, fetch metadata via protocol
-    const p = protocolRef();
-    if (p && APP_CONFIG.tiles.directPMTilesUrl) {
-      let archive = p.tiles.get(APP_CONFIG.tiles.directPMTilesUrl);
-      if (!archive) {
-        archive = new PMTiles(APP_CONFIG.tiles.directPMTilesUrl);
-        p.add(archive);
-      }
-      const metadata = await archive.getMetadata();
-      const header = await archive.getHeader();
-      return {
-        metadata: metadata,
-        bounds: [
-          [header.minLon, header.minLat],
-          [header.maxLon, header.maxLat],
-        ],
-      };
-    }
-  };
 
   const memoizedStyle = createMemo(async () => {
     // Lazy load contour module
@@ -409,22 +357,7 @@ function MapLibreView() {
     return getMaplibreStyle(demSource);
   });
 
-  createEffect(() => {
-    archiveInfo().then((i) => {
-      if (i && i.metadata instanceof Object && "version" in i.metadata) {
-        const tilesetVersion = +(i.metadata.version as string).split(".")[0];
-        if (
-          VERSION_COMPATIBILITY[tilesetVersion].indexOf(STYLE_MAJOR_VERSION) < 0
-        ) {
-          setMismatch(
-            `style v${STYLE_MAJOR_VERSION} may not be compatible with tileset v${tilesetVersion}. `,
-          );
-        } else {
-          setMismatch("");
-        }
-      }
-    });
-  });
+
 
   createEffect(() => {
     if (mapRef) {
@@ -440,18 +373,7 @@ function MapLibreView() {
       <div class="hidden" ref={hiddenRef} />
       <div ref={mapContainer} class="h-full w-full flex" />
       <div class="absolute bottom-0 p-1 text-xs bg-white bg-opacity-50">
-        {timelinessInfo()} z@{zoom().toFixed(2)}
-        <Show when={mismatch()}>
-          <div class="font-bold text-red">
-            {mismatch()}
-            <a
-              class="underline"
-              href="https://docs.protomaps.com/basemaps/downloads#current-version"
-            >
-              See Docs.
-            </a>
-          </div>
-        </Show>
+        z@{zoom().toFixed(2)}
       </div>
     </>
   );
@@ -460,7 +382,7 @@ function MapLibreView() {
 function MapView() {
   return (
     <div class="flex flex-col h-dvh w-full">
-      <div class="h-full flex grow-1">
+      <div class="h-full flex grow">
         <MapLibreView />
       </div>
     </div>

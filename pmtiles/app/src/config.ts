@@ -1,48 +1,75 @@
 /**
- * Tile Configuration for PMTiles Sources
+ * Tile Configuration for PMTiles Sources via Cloudflare Workers + R2
  * 
- * This configuration supports two modes:
- * 1. Direct PMTiles (via pmtiles:// protocol) - Good for local dev or simple hosting
- * 2. Cloudflare Workers (via tiles[] array) - Production-grade, fast edge delivery
+ * This configuration exclusively uses Cloudflare Workers for serving PMTiles archives.
+ * All archives are stored in R2 and served through a Cloudflare Worker for optimal
+ * performance and cost-efficiency.
  * 
  * CLOUDFLARE WORKER SETUP:
  * ========================
  * 
- * 1. Create a Cloudflare Worker with PMTiles support
- *    - Use the official protomaps/PMTiles cloudflare-worker template
- *    - Or use: https://github.com/protomaps/PMTiles/tree/main/serverless/cloudflare
+ * 1. Deploy the PMTiles Cloudflare Worker:
+ *    - Use: https://github.com/protomaps/PMTiles/tree/main/serverless/cloudflare
+ *    - The worker handles tile requests from multiple .pmtiles archives
  * 
  * 2. Bind your R2 bucket to the worker:
  *    - In Cloudflare Dashboard: Workers & Pages > Your Worker > Settings > Variables
  *    - Add R2 Bucket Binding: name = "BUCKET", bucket = "grid3-maptiles"
  * 
- * 3. Deploy the worker and note the URL (e.g., https://your-worker.yourname.workers.dev)
+ * 3. Upload your PMTiles archives to R2:
+ *    - global.pmtiles (Protomaps basemap)
+ *    - buildings.pmtiles (Overture buildings)
+ *    - grid3.pmtiles (GRID3 data layer)
  * 
- * 4. Update CLOUDFLARE_WORKER_URL below with your worker URL
+ * 4. Set VITE_CLOUDFLARE_WORKER_URL environment variable to your worker URL
  * 
- * TILE SERVING PATTERNS:
- * =====================
- * - Cloudflare Worker: https://your-worker.workers.dev/{archive-name}/{z}/{x}/{y}.pbf
- * - Direct PMTiles: pmtiles://https://your-r2-url/planet.pmtiles
+ * TILE SERVING PATTERN:
+ * ====================
+ * https://your-worker.workers.dev/{archive-name}/{z}/{x}/{y}.mvt
  * 
- * For production, Cloudflare Workers provide:
+ * The worker automatically maps {archive-name} to {archive-name}.pmtiles in R2.
+ * 
+ * BENEFITS:
+ * =========
  * - Edge caching (faster global delivery)
  * - Automatic HTTP/2 and HTTP/3
  * - DDoS protection
- * - No egress fees from R2 (unlike direct R2 access)
+ * - No R2 egress fees (Class A reads only)
+ * - Multiple archive support without protocol complexity
  */
 
+/**
+ * Archive source definition
+ */
+export interface ArchiveSource {
+  archiveName: string;
+  attribution: string;
+  maxzoom?: number;
+}
+
+/**
+ * Asset configuration (sprites, fonts, etc.)
+ */
 export interface AssetConfig {
   spriteBaseUrl: string;
+  glyphsUrl: string;
 }
 
+/**
+ * Tile configuration
+ */
 export interface TileConfig {
-  useCloudflare: boolean;
   cloudflareWorkerUrl: string;
-  archiveName: string;
-  directPMTilesUrl: string;
+  sources: {
+    protomaps: ArchiveSource;
+    overture: ArchiveSource;
+    grid3: ArchiveSource;
+  };
 }
 
+/**
+ * Application configuration
+ */
 export interface AppConfig {
   tiles: TileConfig;
   assets: AssetConfig;
@@ -56,16 +83,27 @@ const getEnvVar = (key: string, defaultValue: string = ""): string => {
 
 export const APP_CONFIG: AppConfig = {
   tiles: {
-    useCloudflare: getEnvVar("VITE_USE_CLOUDFLARE", "true") === "true",
     cloudflareWorkerUrl: getEnvVar(
       "VITE_CLOUDFLARE_WORKER_URL",
       "https://pmtiles-cloudflare.mheaton-945.workers.dev"
     ),
-    archiveName: getEnvVar("VITE_BASELAYER_NAME", "global"),
-    directPMTilesUrl: getEnvVar(
-      "VITE_BASELAYER_URL",
-      "https://pub-927f42809d2e4b89b96d1e7efb091d1f.r2.dev/global.pmtiles"
-    ),
+    sources: {
+      protomaps: {
+        archiveName: getEnvVar("VITE_PROTOMAPS_ARCHIVE", "global"),
+        attribution: '<a href="https://github.com/protomaps/basemaps">Protomaps</a> © <a href="https://openstreetmap.org">OpenStreetMap</a>',
+        maxzoom: 22,
+      },
+      overture: {
+        archiveName: getEnvVar("VITE_OVERTURE_ARCHIVE", "buildings"),
+        attribution: '<a href="https://overturemaps.org">Overture Maps Foundation</a>',
+        maxzoom: 14,
+      },
+      grid3: {
+        archiveName: getEnvVar("VITE_GRID3_ARCHIVE", "grid3"),
+        attribution: '<a href="https://grid3.org">GRID3</a>',
+        maxzoom: 15,
+      },
+    },
   },
   assets: {
     // R2-hosted sprites (use Protomaps default if not set)
@@ -73,45 +111,61 @@ export const APP_CONFIG: AppConfig = {
       "VITE_SPRITE_BASE_URL",
       "https://protomaps.github.io/basemaps-assets/sprites/v4"
     ),
+    glyphsUrl: getEnvVar(
+      "VITE_GLYPHS_URL",
+      "https://protomaps.github.io/basemaps-assets/fonts/{fontstack}/{range}.pbf"
+    ),
   },
 };
 
 // ============================================================================
 // Helper Functions
 // ============================================================================
+
 /**
- * Get the tile source configuration for MapLibre
- * Returns either a 'url' (for pmtiles protocol) or 'tiles' array (for Cloudflare Worker)
+ * Get the tile source configuration for MapLibre using Cloudflare Worker
+ * 
+ * @param sourceName - The source name ('protomaps', 'overture', or 'grid3')
+ * @returns MapLibre source configuration with tiles array and attribution
  */
-export function getTileSourceConfig(archiveName?: string): { url?: string; tiles?: string[]; attribution: string } {
-  const attribution = '<a href="https://github.com/protomaps/basemaps">Protomaps</a> © <a href="https://openstreetmap.org">OpenStreetMap</a>';
+export function getTileSourceConfig(
+  sourceName: keyof TileConfig["sources"]
+): { tiles: string[]; attribution: string; maxzoom?: number } {
   const config = APP_CONFIG.tiles;
-  const archive = archiveName || config.archiveName;
+  const source = config.sources[sourceName];
   
-  if (config.useCloudflare) {
-    if (!config.cloudflareWorkerUrl) {
-      console.error("Cloudflare Worker URL not configured! Falling back to direct PMTiles.");
-      const baseUrl = config.directPMTilesUrl.replace(/[^/]+\.pmtiles$/, '');
-      return {
-        url: `pmtiles://${baseUrl}${archive}.pmtiles`,
-        attribution,
-      };
-    }
-    
-    // Cloudflare Worker pattern: {worker-url}/{archive-name}/{z}/{x}/{y}.mvt
-    // The worker maps {name} to {name}.pmtiles in your R2 bucket
-    return {
-      tiles: [`${config.cloudflareWorkerUrl}/${archive}/{z}/{x}/{y}.mvt`],
-      attribution,
-    };
-  } else {
-    // Direct PMTiles via protocol
-    const baseUrl = config.directPMTilesUrl.replace(/[^/]+\.pmtiles$/, '');
-    return {
-      url: `pmtiles://${baseUrl}${archive}.pmtiles`,
-      attribution,
-    };
+  if (!config.cloudflareWorkerUrl) {
+    console.error("Cloudflare Worker URL not configured!");
+    throw new Error("VITE_CLOUDFLARE_WORKER_URL must be set");
   }
+  
+  if (!source) {
+    console.error(`Unknown source: ${sourceName}`);
+    throw new Error(`Source '${sourceName}' not found in configuration`);
+  }
+  
+  // Cloudflare Worker pattern: {worker-url}/{archive-name}/{z}/{x}/{y}.mvt
+  // The worker maps {archive-name} to {archive-name}.pmtiles in R2 bucket
+  return {
+    tiles: [`${config.cloudflareWorkerUrl}/${source.archiveName}/{z}/{x}/{y}.mvt`],
+    attribution: source.attribution,
+    ...(source.maxzoom && { maxzoom: source.maxzoom }),
+  };
+}
+
+/**
+ * Get tile source configuration by archive name (for backward compatibility)
+ * Maps common archive names to source keys
+ */
+export function getTileSourceByArchive(archiveName: string): ReturnType<typeof getTileSourceConfig> {
+  const archiveMap: Record<string, keyof TileConfig["sources"]> = {
+    global: "protomaps",
+    buildings: "overture",
+    grid3: "grid3",
+  };
+  
+  const sourceName = archiveMap[archiveName] || "protomaps";
+  return getTileSourceConfig(sourceName);
 }
 
 /**
@@ -121,18 +175,19 @@ export function validateConfig(): { valid: boolean; errors: string[] } {
   const errors: string[] = [];
   const config = APP_CONFIG.tiles;
   
-  if (config.useCloudflare) {
-    if (!config.cloudflareWorkerUrl) {
-      errors.push("Cloudflare Worker URL is required when useCloudflare is true");
-    }
-    if (!config.archiveName) {
-      errors.push("Archive name is required");
-    }
-  } else {
-    if (!config.directPMTilesUrl) {
-      errors.push("Direct PMTiles URL is required when useCloudflare is false");
-    }
+  if (!config.cloudflareWorkerUrl) {
+    errors.push("Cloudflare Worker URL is required (VITE_CLOUDFLARE_WORKER_URL)");
   }
+  
+  // Validate each source
+  (Object.entries(config.sources) as [keyof TileConfig["sources"], ArchiveSource][]).forEach(([name, source]) => {
+    if (!source.archiveName) {
+      errors.push(`Archive name is required for source '${name}'`);
+    }
+    if (!source.attribution) {
+      errors.push(`Attribution is required for source '${name}'`);
+    }
+  });
   
   return {
     valid: errors.length === 0,
@@ -144,23 +199,27 @@ export function validateConfig(): { valid: boolean; errors: string[] } {
  * Log the current configuration (for debugging)
  */
 export function logConfig(): void {
-  const tileSource = getTileSourceConfig();
-  const config = APP_CONFIG.tiles;
-  console.log("=== Tile Configuration ===");
-  console.log("Mode:", config.useCloudflare ? "Cloudflare Worker" : "Direct PMTiles");
-  console.log("Archive:", config.archiveName);
-  console.log("Sprite Base URL:", APP_CONFIG.assets.spriteBaseUrl);
+  console.log("=== PMTiles Configuration (Cloudflare Workers + R2) ===");
+  console.log("Worker URL:", APP_CONFIG.tiles.cloudflareWorkerUrl);
+  console.log("\nSources:");
   
-  if (tileSource.url) {
-    console.log("PMTiles URL:", tileSource.url);
-  }
-  if (tileSource.tiles) {
-    console.log("Tile Pattern:", tileSource.tiles[0]);
-  }
+  (Object.keys(APP_CONFIG.tiles.sources) as (keyof TileConfig["sources"])[]).forEach((sourceName) => {
+    const source = getTileSourceConfig(sourceName);
+    console.log(`\n  ${sourceName}:`);
+    console.log(`    Pattern: ${source.tiles[0]}`);
+    if (source.maxzoom) {
+      console.log(`    Max Zoom: ${source.maxzoom}`);
+    }
+  });
+  
+  console.log("\nAssets:");
+  console.log("  Sprites:", APP_CONFIG.assets.spriteBaseUrl);
+  console.log("  Glyphs:", APP_CONFIG.assets.glyphsUrl);
   
   const validation = validateConfig();
   if (!validation.valid) {
-    console.warn("Configuration errors:", validation.errors);
+    console.warn("\nConfiguration errors:");
+    validation.errors.forEach((error) => console.warn(`  - ${error}`));
   }
-  console.log("========================");
+  console.log("===================================================");
 }
