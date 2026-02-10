@@ -5,6 +5,12 @@
             "type": "vector",
             "attribution": "<a href=\"https://github.com/protomaps/basemaps\">Protomaps</a> © <a href=\"https://openstreetmap.org\">OpenStreetMap</a>",
             "url": "pmtiles://https://pub-927f42809d2e4b89b96d1e7efb091d1f.r2.dev/global.pmtiles"
+        },
+        "overture": {
+            "type": "vector",
+            "attribution": "<a href=\"https://overturemaps.org\">Overture Maps</a>",
+            "url": "pmtiles://https://pub-927f42809d2e4b89b96d1e7efb091d1f.r2.dev/buildings.pmtiles",
+            "maxzoom": 14
         }
     },
     "layers": [
@@ -1066,19 +1072,81 @@
             }
         },
         {
-            "id": "buildings",
+            "id": "buildings-flat",
             "type": "fill",
-            "source": "protomaps",
-            "source-layer": "buildings",
-            "filter": [
-                "in",
-                "kind",
-                "building",
-                "building_part"
-            ],
+            "source": "overture",
+            "source-layer": "building",
+            "minzoom": 11,
+            "maxzoom": 15,
+            "layout": {
+                "visibility": "visible"
+            },
             "paint": {
-                "fill-color": "#cccccc",
-                "fill-opacity": 0.5
+                "fill-color": "#D7B9E4",
+                "fill-opacity": [
+                    "interpolate",
+                    ["linear"],
+                    ["zoom"],
+                    11, 0,
+                    12, 0.4,
+                    13, 0.6,
+                    14, 0.8,
+                    15, 0
+                ]
+            }
+        },
+        {
+            "id": "buildings-extrusion",
+            "type": "fill-extrusion",
+            "source": "overture",
+            "source-layer": "building",
+            "minzoom": 13,
+            "layout": {
+                "visibility": "visible"
+            },
+            "paint": {
+                "fill-extrusion-color": "#d8d8d8",
+                "fill-extrusion-height": ["coalesce", ["get", "height"], 5],
+                "fill-extrusion-base": 0,
+                "fill-extrusion-opacity": [
+                    "interpolate",
+                    ["linear"],
+                    ["zoom"],
+                    13, 0,
+                    14, 0.7,
+                    15, 0.9
+                ]
+            }
+        },
+        {
+            "id": "building-outlines",
+            "type": "line",
+            "source": "overture",
+            "source-layer": "building",
+            "minzoom": 12,
+            "layout": {
+                "visibility": "visible"
+            },
+            "paint": {
+                "line-color": "#9a9a9a",
+                "line-width": [
+                    "interpolate",
+                    ["linear"],
+                    ["zoom"],
+                    11, 0,
+                    12, 0.3,
+                    13, 0.5,
+                    14, 0.7,
+                    16, 1.0
+                ],
+                "line-opacity": [
+                    "interpolate",
+                    ["linear"],
+                    ["zoom"],
+                    11, 0,
+                    12, 0.2,
+                    14, 0.5
+                ]
             }
         },
         {

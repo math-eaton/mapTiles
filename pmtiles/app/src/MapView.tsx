@@ -119,76 +119,56 @@ function getMaplibreStyle(demSource: any): StyleSpecification {
   const tileSourceConfig = getTileSourceConfig();
   const buildingsSourceConfig = getTileSourceConfig("buildings");
 
-  // Override/add tile sources with our configuration
-  style.sources = {
-    ...style.sources,
-    protomaps: {
+  // Update the existing sources with dynamic configuration
+  // Following the pattern from data_sandwich.html example
+  if (style.sources.protomaps) {
+    style.sources.protomaps = {
       type: "vector",
       attribution: tileSourceConfig.attribution,
-      // Use either 'url' (for pmtiles:// protocol) or 'tiles' (for Cloudflare Worker)
       ...(tileSourceConfig.url ? { url: tileSourceConfig.url } : {}),
       ...(tileSourceConfig.tiles ? { tiles: tileSourceConfig.tiles } : {}),
-      maxzoom: 22, // Allow overzooming
-    },
-    buildings: {
+      maxzoom: 22,
+    };
+  }
+
+  if (style.sources.overture) {
+    style.sources.overture = {
       type: "vector",
       attribution: buildingsSourceConfig.attribution,
       ...(buildingsSourceConfig.url ? { url: buildingsSourceConfig.url } : {}),
       ...(buildingsSourceConfig.tiles ? { tiles: buildingsSourceConfig.tiles } : {}),
-      maxzoom: 22,
-    },
-    dem: {
-      type: "raster-dem",
-      encoding: "terrarium",
-      tiles: [demSource.sharedDemProtocolUrl],
-      maxzoom: 16,
-      tileSize: 256,
-    },
-    contours: {
-      type: "vector",
-      tiles: [
-        demSource.contourProtocolUrl({
-          multiplier: 1, // Keep meters
-          thresholds: {
-            9: [100, 200],
-            10: [50, 100],
-            11: [25, 100],
-            12: [12.5, 50],
-            13: [5, 30],
-          },
-          elevationKey: "ele",
-          levelKey: "level",
-          contourLayer: "contours",
-        }),
-      ],
-      maxzoom: 16,
-    },
+      maxzoom: 14,
+    };
+  }
+
+  // Add DEM and contours sources for terrain
+  style.sources.dem = {
+    type: "raster-dem",
+    encoding: "terrarium",
+    tiles: [demSource.sharedDemProtocolUrl],
+    maxzoom: 16,
+    tileSize: 256,
   };
 
-  // Add buildings layers
-  style.layers = [
-    ...style.layers,
-    {
-      id: "custom-buildings-fill",
-      type: "fill",
-      source: "buildings",
-      "source-layer": "buildings",
-      paint: {
-        "fill-color": "#2bff00",
-        "fill-opacity": 0.7,
-      },
-    },
-    {
-      id: "custom-buildings-outline",
-      type: "line",
-      source: "buildings",
-      "source-layer": "buildings",
-      paint: {
-        "line-color": "#5050ff",
-        "line-width": 0.5,
-      },
-    },
-  ];
+  style.sources.contours = {
+    type: "vector",
+    tiles: [
+      demSource.contourProtocolUrl({
+        multiplier: 1, // Keep meters
+        thresholds: {
+          9: [100, 200],
+          10: [50, 100],
+          11: [25, 100],
+          12: [12.5, 50],
+          13: [5, 30],
+        },
+        elevationKey: "ele",
+        levelKey: "level",
+        contourLayer: "contours",
+      }),
+    ],
+    maxzoom: 16,
+  };
 
   return style;
 }
