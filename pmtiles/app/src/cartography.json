@@ -57,9 +57,9 @@
                     6,
                     0.4,
                     9,
-                    0.2,
+                    0.25,
                     15,
-                    0.1
+                    0.05
                 ],
                 "hillshade-shadow-color": [
                     "interpolate",
@@ -170,7 +170,7 @@
                     ],
                     6,
                     0,
-                    11,
+                    10,
                     1
                 ],
                 "fill-color": [
@@ -303,7 +303,19 @@
                 "hospital"
             ],
             "paint": {
-                "fill-color": "#e4dad9"
+                "fill-color": [
+                    "interpolate",
+                    [
+                        "linear"
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    12,
+                    "#FABBCB",
+                    16,
+                    "#e65c5c"
+                ]
             }
         },
         {
@@ -317,7 +329,7 @@
                 "industrial"
             ],
             "paint": {
-                "fill-color": "#d1dde1"
+                "fill-color": "#C8C9C7"
             }
         },
         {
@@ -333,7 +345,7 @@
                 "college"
             ],
             "paint": {
-                "fill-color": "#e4ded7"
+                "fill-color": "#F8E08E"
             }
         },
         {
@@ -517,8 +529,8 @@
                             "level"
                         ],
                         1,
-                        0.6,
-                        0.4
+                        0.5,
+                        0.3
                     ],
                     16,
                     [
@@ -528,7 +540,7 @@
                             "level"
                         ],
                         1,
-                        0.5,
+                        0.6,
                         0.5
                     ]
                 ]
@@ -594,20 +606,6 @@
             }
         },
         {
-            "id": "water",
-            "type": "fill",
-            "filter": [
-                "==",
-                "$type",
-                "Polygon"
-            ],
-            "source": "protomaps",
-            "source-layer": "water",
-            "paint": {
-                "fill-color": "#A4DBE8"
-            }
-        },
-        {
             "id": "water_stream",
             "type": "line",
             "source": "protomaps",
@@ -632,7 +630,49 @@
                     14,
                     0,
                     14.5,
-                    0.5
+                    0.5,
+                    16,
+                    1
+                ]
+            }
+        },
+        {
+            "id": "water_river_casing",
+            "type": "line",
+            "source": "protomaps",
+            "source-layer": "water",
+            "minzoom": 9,
+            "filter": [
+                "in",
+                "kind",
+                "river"
+            ],
+            "paint": {
+                "line-color": [
+                    "interpolate",
+                    [
+                        "linear"
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    8,
+                    "#00A3E0",
+                    13,
+                    "#71C5E8"
+                ],
+                "line-width": [
+                    "interpolate",
+                    [
+                        "linear"
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    9,
+                    0,
+                    16,
+                    6
                 ]
             }
         },
@@ -677,6 +717,59 @@
                     18,
                     12
                 ]
+            }
+        },
+        {
+            "id": "water_casing",
+            "type": "line",
+            "filter": [
+                "==",
+                "$type",
+                "Polygon"
+            ],
+            "source": "protomaps",
+            "source-layer": "water",
+            "paint": {
+                "line-color": [
+                    "interpolate",
+                    [
+                        "linear"
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    8,
+                    "#00A3E0",
+                    13,
+                    "#71C5E8"
+                ],
+                "line-width": [
+                    "interpolate",
+                    [
+                        "linear"
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    9,
+                    0,
+                    16,
+                    4
+                ]
+            }
+        },
+        {
+            "id": "water",
+            "type": "fill",
+            "filter": [
+                "==",
+                "$type",
+                "Polygon"
+            ],
+            "source": "protomaps",
+            "source-layer": "water",
+            "paint": {
+                "fill-color": "#A4DBE8"
             }
         },
         {
@@ -1998,6 +2091,29 @@
             }
         },
         {
+            "id": "buildings-extrusion",
+            "type": "fill-extrusion",
+            "source": "overture",
+            "source-layer": "building",
+            "minzoom": 13,
+            "layout": {
+                "visibility": "visible"
+            },
+            "paint": {
+                "fill-extrusion-color": "#A2ACAB",
+                "fill-extrusion-height": [
+                    "coalesce",
+                    [
+                        "get",
+                        "height"
+                    ],
+                    5
+                ],
+                "fill-extrusion-base": 1,
+                "fill-extrusion-opacity": 0.5
+            }
+        },
+                {
             "id": "buildings-flat",
             "type": "fill",
             "source": "overture",
@@ -2005,10 +2121,23 @@
             "minzoom": 11,
             "maxzoom": 15,
             "layout": {
-                "visibility": "visible"
+                "visibility": "none"
             },
             "paint": {
-                "fill-color": "#C98BDB",
+                "fill-color": [
+                    "interpolate",
+                    [
+                        "exponential",
+                        1.6
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    11,
+                    "#EFBAE190",
+                    15,
+                    "#EBC6DF"
+                ],
                 "fill-opacity": [
                     "interpolate",
                     [
@@ -2032,26 +2161,16 @@
             }
         },
         {
-            "id": "buildings-extrusion",
-            "type": "fill-extrusion",
+            "id": "building-outlines",
+            "type": "line",
             "source": "overture",
             "source-layer": "building",
-            "minzoom": 13,
+            "minzoom": 11,
             "layout": {
-                "visibility": "visible"
+                "visibility": "none"
             },
             "paint": {
-                "fill-extrusion-color": "#E6BEDD",
-                "fill-extrusion-height": [
-                    "coalesce",
-                    [
-                        "get",
-                        "height"
-                    ],
-                    5
-                ],
-                "fill-extrusion-base": 0,
-                "fill-extrusion-opacity": [
+                "line-color": [
                     "interpolate",
                     [
                         "exponential",
@@ -2060,26 +2179,11 @@
                     [
                         "zoom"
                     ],
-                    13,
-                    0,
-                    14,
-                    0.7,
-                    15,
-                    0.9
-                ]
-            }
-        },
-        {
-            "id": "building-outlines",
-            "type": "line",
-            "source": "overture",
-            "source-layer": "building",
-            "minzoom": 12,
-            "layout": {
-                "visibility": "visible"
-            },
-            "paint": {
-                "line-color": "#9a9a9a",
+                    11,
+                    "#5B6770",
+                    16,
+                    "#C1C6C8"
+                ],
                 "line-width": [
                     "interpolate",
                     [
@@ -2091,12 +2195,8 @@
                     ],
                     11,
                     0,
-                    12,
-                    0.3,
                     13,
                     0.5,
-                    14,
-                    0.7,
                     16,
                     1.0
                 ],
@@ -2689,11 +2789,11 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ]
                                 ],
                                 {},
@@ -2707,12 +2807,12 @@
                                             "!",
                                             [
                                                 "has",
-                                                "name:en"
+                                                "name:fr"
                                             ]
                                         ],
                                         [
                                             "has",
-                                            "name:en"
+                                            "name:fr"
                                         ],
                                         [
                                             "!",
@@ -2763,7 +2863,7 @@
                             ],
                             [
                                 "get",
-                                "name:en"
+                                "name:fr"
                             ]
                         ],
                         [
@@ -2772,7 +2872,7 @@
                                 "coalesce",
                                 [
                                     "get",
-                                    "name:en"
+                                    "name:fr"
                                 ],
                                 [
                                     "get",
@@ -2842,7 +2942,7 @@
                             "format",
                             [
                                 "get",
-                                "name:en"
+                                "name:fr"
                             ],
                             {},
                             "\n",
@@ -2934,7 +3034,7 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
@@ -2991,7 +3091,7 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
@@ -3065,7 +3165,7 @@
                             "format",
                             [
                                 "get",
-                                "name:en"
+                                "name:fr"
                             ],
                             {},
                             "\n",
@@ -3198,7 +3298,7 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
@@ -3300,7 +3400,7 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
@@ -3395,7 +3495,7 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
@@ -3611,11 +3711,11 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ]
                                 ],
                                 {},
@@ -3629,12 +3729,12 @@
                                             "!",
                                             [
                                                 "has",
-                                                "name:en"
+                                                "name:fr"
                                             ]
                                         ],
                                         [
                                             "has",
-                                            "name:en"
+                                            "name:fr"
                                         ],
                                         [
                                             "!",
@@ -3685,7 +3785,7 @@
                             ],
                             [
                                 "get",
-                                "name:en"
+                                "name:fr"
                             ]
                         ],
                         [
@@ -3694,7 +3794,7 @@
                                 "coalesce",
                                 [
                                     "get",
-                                    "name:en"
+                                    "name:fr"
                                 ],
                                 [
                                     "get",
@@ -3764,7 +3864,7 @@
                             "format",
                             [
                                 "get",
-                                "name:en"
+                                "name:fr"
                             ],
                             {},
                             "\n",
@@ -3856,7 +3956,7 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
@@ -3913,7 +4013,7 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
@@ -3987,7 +4087,7 @@
                             "format",
                             [
                                 "get",
-                                "name:en"
+                                "name:fr"
                             ],
                             {},
                             "\n",
@@ -4120,7 +4220,7 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
@@ -4222,7 +4322,7 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
@@ -4317,7 +4417,7 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
@@ -4507,11 +4607,11 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ]
                                 ],
                                 {},
@@ -4525,12 +4625,12 @@
                                             "!",
                                             [
                                                 "has",
-                                                "name:en"
+                                                "name:fr"
                                             ]
                                         ],
                                         [
                                             "has",
-                                            "name:en"
+                                            "name:fr"
                                         ],
                                         [
                                             "!",
@@ -4581,7 +4681,7 @@
                             ],
                             [
                                 "get",
-                                "name:en"
+                                "name:fr"
                             ]
                         ],
                         [
@@ -4590,7 +4690,7 @@
                                 "coalesce",
                                 [
                                     "get",
-                                    "name:en"
+                                    "name:fr"
                                 ],
                                 [
                                     "get",
@@ -4660,7 +4760,7 @@
                             "format",
                             [
                                 "get",
-                                "name:en"
+                                "name:fr"
                             ],
                             {},
                             "\n",
@@ -4752,7 +4852,7 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
@@ -4809,7 +4909,7 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
@@ -4883,7 +4983,7 @@
                             "format",
                             [
                                 "get",
-                                "name:en"
+                                "name:fr"
                             ],
                             {},
                             "\n",
@@ -5016,7 +5116,7 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
@@ -5118,7 +5218,7 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
@@ -5213,7 +5313,7 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
@@ -5414,11 +5514,11 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ]
                                 ],
                                 {},
@@ -5432,12 +5532,12 @@
                                             "!",
                                             [
                                                 "has",
-                                                "name:en"
+                                                "name:fr"
                                             ]
                                         ],
                                         [
                                             "has",
-                                            "name:en"
+                                            "name:fr"
                                         ],
                                         [
                                             "!",
@@ -5488,7 +5588,7 @@
                             ],
                             [
                                 "get",
-                                "name:en"
+                                "name:fr"
                             ]
                         ],
                         [
@@ -5497,7 +5597,7 @@
                                 "coalesce",
                                 [
                                     "get",
-                                    "name:en"
+                                    "name:fr"
                                 ],
                                 [
                                     "get",
@@ -5567,7 +5667,7 @@
                             "format",
                             [
                                 "get",
-                                "name:en"
+                                "name:fr"
                             ],
                             {},
                             "\n",
@@ -5659,7 +5759,7 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
@@ -5716,7 +5816,7 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
@@ -5790,7 +5890,7 @@
                             "format",
                             [
                                 "get",
-                                "name:en"
+                                "name:fr"
                             ],
                             {},
                             "\n",
@@ -5923,7 +6023,7 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
@@ -6025,7 +6125,7 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
@@ -6120,7 +6220,7 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
@@ -6309,11 +6409,11 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ]
                                 ],
                                 {},
@@ -6327,12 +6427,12 @@
                                             "!",
                                             [
                                                 "has",
-                                                "name:en"
+                                                "name:fr"
                                             ]
                                         ],
                                         [
                                             "has",
-                                            "name:en"
+                                            "name:fr"
                                         ],
                                         [
                                             "!",
@@ -6383,7 +6483,7 @@
                             ],
                             [
                                 "get",
-                                "name:en"
+                                "name:fr"
                             ]
                         ],
                         [
@@ -6392,7 +6492,7 @@
                                 "coalesce",
                                 [
                                     "get",
-                                    "name:en"
+                                    "name:fr"
                                 ],
                                 [
                                     "get",
@@ -6462,7 +6562,7 @@
                             "format",
                             [
                                 "get",
-                                "name:en"
+                                "name:fr"
                             ],
                             {},
                             "\n",
@@ -6554,7 +6654,7 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
@@ -6611,7 +6711,7 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
@@ -6685,7 +6785,7 @@
                             "format",
                             [
                                 "get",
-                                "name:en"
+                                "name:fr"
                             ],
                             {},
                             "\n",
@@ -6818,7 +6918,7 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
@@ -6920,7 +7020,7 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
@@ -7015,7 +7115,7 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
@@ -7324,11 +7424,11 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ]
                                 ],
                                 {},
@@ -7342,12 +7442,12 @@
                                             "!",
                                             [
                                                 "has",
-                                                "name:en"
+                                                "name:fr"
                                             ]
                                         ],
                                         [
                                             "has",
-                                            "name:en"
+                                            "name:fr"
                                         ],
                                         [
                                             "!",
@@ -7398,7 +7498,7 @@
                             ],
                             [
                                 "get",
-                                "name:en"
+                                "name:fr"
                             ]
                         ],
                         [
@@ -7407,7 +7507,7 @@
                                 "coalesce",
                                 [
                                     "get",
-                                    "name:en"
+                                    "name:fr"
                                 ],
                                 [
                                     "get",
@@ -7477,7 +7577,7 @@
                             "format",
                             [
                                 "get",
-                                "name:en"
+                                "name:fr"
                             ],
                             {},
                             "\n",
@@ -7569,7 +7669,7 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
@@ -7626,7 +7726,7 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
@@ -7700,7 +7800,7 @@
                             "format",
                             [
                                 "get",
-                                "name:en"
+                                "name:fr"
                             ],
                             {},
                             "\n",
@@ -7833,7 +7933,7 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
@@ -7935,7 +8035,7 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
@@ -8030,7 +8130,7 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
@@ -8290,11 +8390,11 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ]
                                 ],
                                 {},
@@ -8308,12 +8408,12 @@
                                             "!",
                                             [
                                                 "has",
-                                                "name:en"
+                                                "name:fr"
                                             ]
                                         ],
                                         [
                                             "has",
-                                            "name:en"
+                                            "name:fr"
                                         ],
                                         [
                                             "!",
@@ -8364,7 +8464,7 @@
                             ],
                             [
                                 "get",
-                                "name:en"
+                                "name:fr"
                             ]
                         ],
                         [
@@ -8373,7 +8473,7 @@
                                 "coalesce",
                                 [
                                     "get",
-                                    "name:en"
+                                    "name:fr"
                                 ],
                                 [
                                     "get",
@@ -8443,7 +8543,7 @@
                             "format",
                             [
                                 "get",
-                                "name:en"
+                                "name:fr"
                             ],
                             {},
                             "\n",
@@ -8535,7 +8635,7 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
@@ -8592,7 +8692,7 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
@@ -8666,7 +8766,7 @@
                             "format",
                             [
                                 "get",
-                                "name:en"
+                                "name:fr"
                             ],
                             {},
                             "\n",
@@ -8799,7 +8899,7 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
@@ -8901,7 +9001,7 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
@@ -8996,7 +9096,7 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
@@ -9333,11 +9433,11 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ]
                                 ],
                                 {},
@@ -9351,12 +9451,12 @@
                                             "!",
                                             [
                                                 "has",
-                                                "name:en"
+                                                "name:fr"
                                             ]
                                         ],
                                         [
                                             "has",
-                                            "name:en"
+                                            "name:fr"
                                         ],
                                         [
                                             "!",
@@ -9407,7 +9507,7 @@
                             ],
                             [
                                 "get",
-                                "name:en"
+                                "name:fr"
                             ]
                         ],
                         [
@@ -9416,7 +9516,7 @@
                                 "coalesce",
                                 [
                                     "get",
-                                    "name:en"
+                                    "name:fr"
                                 ],
                                 [
                                     "get",
@@ -9486,7 +9586,7 @@
                             "format",
                             [
                                 "get",
-                                "name:en"
+                                "name:fr"
                             ],
                             {},
                             "\n",
@@ -9578,7 +9678,7 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
@@ -9635,7 +9735,7 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
@@ -9709,7 +9809,7 @@
                             "format",
                             [
                                 "get",
-                                "name:en"
+                                "name:fr"
                             ],
                             {},
                             "\n",
@@ -9842,7 +9942,7 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
@@ -9944,7 +10044,7 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
@@ -10039,7 +10139,7 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
@@ -10281,11 +10381,11 @@
                                         "coalesce",
                                         [
                                             "get",
-                                            "name:en"
+                                            "name:fr"
                                         ],
                                         [
                                             "get",
-                                            "name:en"
+                                            "name:fr"
                                         ]
                                     ],
                                     {},
@@ -10299,12 +10399,12 @@
                                                 "!",
                                                 [
                                                     "has",
-                                                    "name:en"
+                                                    "name:fr"
                                                 ]
                                             ],
                                             [
                                                 "has",
-                                                "name:en"
+                                                "name:fr"
                                             ],
                                             [
                                                 "!",
@@ -10355,7 +10455,7 @@
                                 ],
                                 [
                                     "get",
-                                    "name:en"
+                                    "name:fr"
                                 ]
                             ],
                             [
@@ -10364,7 +10464,7 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
@@ -10434,7 +10534,7 @@
                                 "format",
                                 [
                                     "get",
-                                    "name:en"
+                                    "name:fr"
                                 ],
                                 {},
                                 "\n",
@@ -10526,7 +10626,7 @@
                                         "coalesce",
                                         [
                                             "get",
-                                            "name:en"
+                                            "name:fr"
                                         ],
                                         [
                                             "get",
@@ -10583,7 +10683,7 @@
                                         "coalesce",
                                         [
                                             "get",
-                                            "name:en"
+                                            "name:fr"
                                         ],
                                         [
                                             "get",
@@ -10657,7 +10757,7 @@
                                 "format",
                                 [
                                     "get",
-                                    "name:en"
+                                    "name:fr"
                                 ],
                                 {},
                                 "\n",
@@ -10790,7 +10890,7 @@
                                         "coalesce",
                                         [
                                             "get",
-                                            "name:en"
+                                            "name:fr"
                                         ],
                                         [
                                             "get",
@@ -10892,7 +10992,7 @@
                                         "coalesce",
                                         [
                                             "get",
-                                            "name:en"
+                                            "name:fr"
                                         ],
                                         [
                                             "get",
@@ -10987,7 +11087,7 @@
                                         "coalesce",
                                         [
                                             "get",
-                                            "name:en"
+                                            "name:fr"
                                         ],
                                         [
                                             "get",
@@ -11211,11 +11311,11 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ]
                                 ],
                                 {},
@@ -11229,12 +11329,12 @@
                                             "!",
                                             [
                                                 "has",
-                                                "name:en"
+                                                "name:fr"
                                             ]
                                         ],
                                         [
                                             "has",
-                                            "name:en"
+                                            "name:fr"
                                         ],
                                         [
                                             "!",
@@ -11285,7 +11385,7 @@
                             ],
                             [
                                 "get",
-                                "name:en"
+                                "name:fr"
                             ]
                         ],
                         [
@@ -11294,7 +11394,7 @@
                                 "coalesce",
                                 [
                                     "get",
-                                    "name:en"
+                                    "name:fr"
                                 ],
                                 [
                                     "get",
@@ -11364,7 +11464,7 @@
                             "format",
                             [
                                 "get",
-                                "name:en"
+                                "name:fr"
                             ],
                             {},
                             "\n",
@@ -11456,7 +11556,7 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
@@ -11513,7 +11613,7 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
@@ -11587,7 +11687,7 @@
                             "format",
                             [
                                 "get",
-                                "name:en"
+                                "name:fr"
                             ],
                             {},
                             "\n",
@@ -11720,7 +11820,7 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
@@ -11822,7 +11922,7 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
@@ -11917,7 +12017,7 @@
                                     "coalesce",
                                     [
                                         "get",
-                                        "name:en"
+                                        "name:fr"
                                     ],
                                     [
                                         "get",
@@ -12291,11 +12391,11 @@
                         "coalesce",
                         [
                             "get",
-                            "name:en"
+                            "name:fr"
                         ],
                         [
                             "get",
-                            "name:en"
+                            "name:fr"
                         ]
                     ],
                     {}

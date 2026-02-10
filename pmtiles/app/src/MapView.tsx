@@ -32,6 +32,14 @@ import {
 import { getTileSourceConfig, logConfig } from "./config";
 import baseStyle from "./cartography.json";
 
+// Light configuration for 3D features
+const LIGHT_CONFIG = {
+  anchor: "map" as const, // 'viewport' or 'map'
+  position: [240, 45, 45] as [number, number, number], // [radial, azimuthal, polar] in degrees
+  color: "#ffffff",
+  intensity: 0.666, // 0 to 1
+};
+
 function getSourceLayer(l: LayerSpecification): string {
   if ("source-layer" in l && l["source-layer"]) {
     return l["source-layer"];
@@ -169,6 +177,14 @@ function getMaplibreStyle(demSource: any): StyleSpecification {
       }),
     ],
     maxzoom: 16,
+  };
+
+  // Add global light source for 3D features
+  style.light = {
+    anchor: LIGHT_CONFIG.anchor,
+    position: LIGHT_CONFIG.position,
+    color: LIGHT_CONFIG.color,
+    intensity: LIGHT_CONFIG.intensity,
   };
 
   return style;

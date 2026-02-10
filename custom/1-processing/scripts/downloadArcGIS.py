@@ -283,10 +283,12 @@ def get_feature_count(service_url: str, where_clause: str = "1=1", extent: Optio
     
     if extent:
         lon_min, lat_min, lon_max, lat_max = extent
+        # Use simple comma-separated format (most compatible with ArcGIS services)
         params['geometry'] = f"{lon_min},{lat_min},{lon_max},{lat_max}"
         params['geometryType'] = 'esriGeometryEnvelope'
         params['spatialRel'] = 'esriSpatialRelIntersects'
-        params['inSR'] = 4326
+        params['inSR'] = 4326  # Input spatial reference
+        params['outSR'] = 4326  # Output spatial reference
     
     # Validate parameters before sending request
     try:
@@ -472,6 +474,7 @@ def download_with_spatial_chunking(
             
             # Add spatial filter for this chunk
             lon_min, lat_min, lon_max, lat_max = chunk_extent
+            # Use simple comma-separated format (most compatible with ArcGIS services)
             params['geometry'] = f"{lon_min},{lat_min},{lon_max},{lat_max}"
             params['geometryType'] = 'esriGeometryEnvelope'
             params['spatialRel'] = 'esriSpatialRelIntersects'
@@ -587,6 +590,7 @@ def get_objectid_range(service_url: str, where_clause: str = "1=1", extent: Opti
     # Add spatial filter if provided
     if extent:
         lon_min, lat_min, lon_max, lat_max = extent
+        # Use simple comma-separated format (most compatible with ArcGIS services)
         params_min['geometry'] = f"{lon_min},{lat_min},{lon_max},{lat_max}"
         params_min['geometryType'] = 'esriGeometryEnvelope'
         params_min['spatialRel'] = 'esriSpatialRelIntersects'
@@ -746,7 +750,7 @@ def download_features_paginated(
     base_url, existing_params = parse_arcgis_url(service_url)
     
     # X parallel workers
-    # todo: >1 workers triggers 400 error
+    # todo: >1 workers triggers 400 error ... sometimes
     if max_workers is None:
         max_workers = 4
     

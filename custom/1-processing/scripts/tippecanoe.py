@@ -234,13 +234,14 @@ LAYER_SETTINGS = {
     # Heavily optimized for lower zoom levels due to high feature count
     # Filtered by type: Built-up Area (z10+), Small Settlement Area (z11+), Hamlet (z12+)
     'settlement_extents.fgb': [
-        '--no-polygon-splitting',
-        '--no-simplification-of-shared-nodes',
+        # '--no-polygon-splitting',
+        '--hilbert',
+        # '--no-simplification-of-shared-nodes',
         '--simplification=5',  # Higher simplification for many small features
-        '--drop-rate=0.2', 
+        '--drop-rate=0.3', 
         '--minimum-detail=8',
         '--coalesce-smallest-as-needed',  # Merge smallest settlements at low zooms
-        '--drop-smallest-as-needed',  # Drop smallest when tiles too large
+        # '--drop-smallest-as-needed',  # Drop smallest when tiles too large
         '--gamma=1.4',  # Reduce density of clustered settlements
         '--extend-zooms-if-still-dropping-maximum=14',
         '-y', 'type'
@@ -268,11 +269,11 @@ BASE_COMMAND = [
     # '--buffer=8',
     '-zg',
     '-Bg',
-    '--drop-smallest',
+    # '--drop-smallest',
     # '--maximum-tile-bytes=2097152',  # default for all layers
-    '--preserve-input-order',
+    # '--preserve-input-order',
     '--coalesce-densest-as-needed',
-    '--drop-fraction-as-needed',
+    # '--drop-fraction-as-needed',
     '--drop-densest-as-needed',  # Added for better tile size management
     '-P'  # Show progress
 ]

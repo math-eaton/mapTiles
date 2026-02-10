@@ -578,7 +578,7 @@ def process_single_file(file_path, extent=None, output_dir=None):
         cmd = get_tippecanoe_command(file_path, tile_path, layer_name, extent)
         
         # Execute tippecanoe
-        result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+        result = subprocess.run(cmd, check=True, capture_output=False, text=True)
         
         return {
             "success": True,
