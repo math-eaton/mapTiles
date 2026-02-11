@@ -624,7 +624,7 @@
             "source": "grid3",
             "source-layer": "settlement-extents",
             "minzoom": 7,
-            "maxzoom": 15,
+            "maxzoom": 16,
             "layout": {
                 "visibility": "visible"
             },
@@ -649,8 +649,8 @@
                     ["match", ["get", "type"], "Built-up Area", 0.5, "Hamlet", 0, "Small Settlement Area", 0.5, 0],
                     12,
                     ["match", ["get", "type"], "Built-up Area", 0.3, "Hamlet", 0.3, "Small Settlement Area", 0.3, 0],
-                    15,
-                    ["match", ["get", "type"], "Built-up Area", 0, "Hamlet", 0, "Small Settlement Area", 0, 0]
+                    16,
+                    ["match", ["get", "type"], "Built-up Area", 0.2, "Hamlet", 0.2, "Small Settlement Area", 0.2, 0]
                 ]
             }
         },
@@ -684,9 +684,9 @@
                     9,
                     ["match", ["get", "type"], "Built-up Area", 0.5, "Hamlet", 0, "Small Settlement Area", 0.5, 0],
                     12,
-                    ["match", ["get", "type"], "Built-up Area", 0.25, "Hamlet", 0.25, "Small Settlement Area", 0.25, 0],
+                    ["match", ["get", "type"], "Built-up Area", 0.5, "Hamlet", 0.25, "Small Settlement Area", 0.5, 0],
                     15,
-                    ["match", ["get", "type"], "Built-up Area", 0.15, "Hamlet", 0.15, "Small Settlement Area", 0.15, 0]
+                    ["match", ["get", "type"], "Built-up Area", 0.5, "Hamlet", 0.75, "Small Settlement Area", 1, 0]
                 ],
                 "line-opacity": [
                     "interpolate",
