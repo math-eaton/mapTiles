@@ -15,7 +15,21 @@
             "type": "vector",
             "attribution": "<a href=\"https://grid3.org\">GRID3</a>",
             "url": "pmtiles://https://pub-927f42809d2e4b89b96d1e7efb091d1f.r2.dev/grid3.pmtiles"
-        }
+        },
+        "dem": {
+            "type": "raster-dem",
+            "attribution": "<a href=\"https://registry.opendata.aws/terrain-tiles/\">AWS Terrain Tiles</a>",
+            "tiles": ["https://elevation-tiles-prod.s3.amazonaws.com/terrarium/{z}/{x}/{y}.png"],
+            "encoding": "terrarium",
+            "maxzoom": 15,
+            "tileSize": 256
+        },
+        "contours": {
+            "type": "vector",
+            "attribution": "<a href=\"https://registry.opendata.aws/terrain-tiles/\">AWS Terrain Tiles</a>",
+            "tiles": ["https://elevation-tiles-prod.s3.amazonaws.com/contours/{z}/{x}/{y}.pbf"],
+            "maxzoom": 15
+        } 
     },
     "layers": [
         {
