@@ -13166,14 +13166,15 @@
                 ]
             }
         },
-        {
-            "id": "health-areas-boundary-casing",
+                {
+            "id": "health-areas-boundary-early",
             "type": "line",
             "source": "grid3",
             "source-layer": "health-areas",
-            "minzoom": 10,
+            "minzoom": 8,
+            "maxzoom": 11,
             "paint": {
-                "line-color": "#ffffff",
+                "line-color": "#607D8B",
                 "line-width": [
                     "interpolate",
                     [
@@ -13182,12 +13183,52 @@
                     [
                         "zoom"
                     ],
-                    9,
-                    0.6,
+                    8,
+                    0.1,
+                    10.5,
+                    0.8
+                                ],
+                "line-opacity": [
+                    "interpolate",
+                    [
+                        "linear"
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    8,
+                    0,
+                    8.5,
+                    0.3,
+                    10,
+                    0.3,
+                    10.5,
+                    0
+                ]
+            }
+        },
+        {
+            "id": "health-areas-boundary-casing",
+            "type": "line",
+            "source": "grid3",
+            "source-layer": "health-areas",
+            "minzoom": 10,
+            "paint": {
+                "line-color": "#fff",
+                "line-width": [
+                    "interpolate",
+                    [
+                        "linear"
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    10,
+                    0,
+                    10.5,
+                    1.2,
                     14,
-                    1.8,
-                    16,
-                    4
+                    3
                 ],
                 "line-opacity": [
                     "interpolate",
@@ -13197,9 +13238,9 @@
                     [
                         "zoom"
                     ],
-                    9,
+                    10,
                     0,
-                    9.5,
+                    10.5,
                     1
                 ]
             }
@@ -13209,7 +13250,7 @@
             "type": "line",
             "source": "grid3",
             "source-layer": "health-areas",
-            "minzoom": 10,
+            "minzoom": 9,
             "paint": {
                 "line-color": "#F4511E",
                 "line-width": [
@@ -13220,9 +13261,9 @@
                     [
                         "zoom"
                     ],
-                    9,
-                    0.5,
-                    12,
+                    9.5,
+                    0,
+                    10,
                     1,
                     14,
                     1.8
@@ -13239,9 +13280,9 @@
                     [
                         "zoom"
                     ],
-                    9,
-                    0,
                     9.5,
+                    0,
+                    10.5,
                     1
                 ]
             }
