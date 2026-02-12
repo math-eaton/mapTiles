@@ -13515,15 +13515,15 @@
             "type": "symbol",
             "source": "grid3",
             "source-layer": "health-areas-centroids",
-            "minzoom": 10,
+            "minzoom": 9,
             "layout": {
                 "text-field": [
-                    "concat",
-                    "",
-                    [
-                    "get",
-                    "airesante"
-                ]],
+                    "step",
+                    ["zoom"],
+                    ["concat", "", ["get", "airesante"]],
+                    13,
+                    ["concat", "AS ", ["get", "airesante"]]
+                ],
                 "text-font": [
                     "Noto Sans Regular"
                 ],
@@ -13600,12 +13600,11 @@
             "minzoom": 7,
             "layout": {
                 "text-field": [
-                    "concat",
-                    "",
-                    [
-                        "get",
-                        "zonesante"
-                    ]
+                    "step",
+                    ["zoom"],
+                    ["concat", "Zone de santé ", ["get", "zonesante"]],
+                    12,
+                    ["get", "zonesante"]
                 ],
                 "text-font": [
                     "Noto Sans Medium"
