@@ -19,7 +19,9 @@
         "dem": {
             "type": "raster-dem",
             "attribution": "<a href=\"https://registry.opendata.aws/terrain-tiles/\">AWS Terrain Tiles</a>",
-            "tiles": ["https://elevation-tiles-prod.s3.amazonaws.com/terrarium/{z}/{x}/{y}.png"],
+            "tiles": [
+                "https://elevation-tiles-prod.s3.amazonaws.com/terrarium/{z}/{x}/{y}.png"
+            ],
             "encoding": "terrarium",
             "maxzoom": 15,
             "tileSize": 256
@@ -27,9 +29,11 @@
         "contours": {
             "type": "vector",
             "attribution": "<a href=\"https://registry.opendata.aws/terrain-tiles/\">AWS Terrain Tiles</a>",
-            "tiles": ["https://elevation-tiles-prod.s3.amazonaws.com/contours/{z}/{x}/{y}.pbf"],
+            "tiles": [
+                "https://elevation-tiles-prod.s3.amazonaws.com/contours/{z}/{x}/{y}.pbf"
+            ],
             "maxzoom": 15
-        } 
+        }
     },
     "layers": [
         {
@@ -1493,7 +1497,7 @@
                 ]
             }
         },
-                {
+        {
             "id": "roads_other_casing_late",
             "type": "line",
             "source": "protomaps",
@@ -2127,13 +2131,19 @@
                 ]
             ],
             "paint": {
-                "line-color": ["interpolate",
-                ["linear"],
-                ["zoom"],
-                3,
-                "#fff",
-                12,
-                "#FAFAFA"],
+                "line-color": [
+                    "interpolate",
+                    [
+                        "linear"
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    3,
+                    "#fff",
+                    12,
+                    "#FAFAFA"
+                ],
                 "line-gap-width": [
                     "interpolate",
                     [
@@ -3072,7 +3082,7 @@
                 ]
             }
         },
-                {
+        {
             "id": "settlement-extents-outline",
             "type": "line",
             "source": "grid3",
@@ -13101,6 +13111,439 @@
                 "text-color": "#a3a3a3",
                 "text-halo-color": "#e2dfda",
                 "text-halo-width": 1
+            }
+        },
+        {
+            "id": "health-zones-boundary",
+            "type": "line",
+            "source": "grid3",
+            "source-layer": "health-zones",
+            "minzoom": 7,
+            "paint": {
+                "line-color": "#B388FF",
+                "line-width": [
+                    "interpolate",
+                    [
+                        "linear"
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    7,
+                    0.5,
+                    12,
+                    1,
+                    16,
+                    2.5
+                ],
+                "line-gap-width": [
+                    "interpolate",
+                    [
+                        "linear"
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    10,
+                    0,
+                    10.5,
+                    3,
+                    16,
+                    5
+                ]
+            }
+        },
+        {
+            "id": "health-areas-boundary-casing",
+            "type": "line",
+            "source": "grid3",
+            "source-layer": "health-areas",
+            "minzoom": 10,
+            "paint": {
+                "line-color": "#ffffff",
+                "line-width": [
+                    "interpolate",
+                    [
+                        "linear"
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    9,
+                    0.6,
+                    14,
+                    1.8,
+                    16,
+                    4
+                ],
+                "line-opacity": [
+                    "interpolate",
+                    [
+                        "linear"
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    9,
+                    0,
+                    9.5,
+                    1
+                ]
+            }
+        },
+        {
+            "id": "health-areas-boundary",
+            "type": "line",
+            "source": "grid3",
+            "source-layer": "health-areas",
+            "minzoom": 10,
+            "paint": {
+                "line-color": "#F4511E",
+                "line-width": [
+                    "interpolate",
+                    [
+                        "linear"
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    9,
+                    0.5,
+                    12,
+                    1,
+                    14,
+                    1.8
+                ],
+                "line-dasharray": [
+                    6,
+                    12
+                ],
+                "line-opacity": [
+                    "interpolate",
+                    [
+                        "linear"
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    9,
+                    0,
+                    9.5,
+                    1
+                ]
+            }
+        },
+        {
+            "id": "health-zones-boundary-label",
+            "type": "symbol",
+            "source": "grid3",
+            "source-layer": "health-zones",
+            "minzoom": 8,
+            "layout": {
+                "symbol-placement": "line",
+                "text-field": [
+                    "concat",
+                    "Zone de santé ",
+                    [
+                        "get",
+                        "zonesante"
+                    ]
+                ],
+                "text-font": [
+                    "Noto Sans Medium"
+                ],
+                "text-size": [
+                    "interpolate",
+                    [
+                        "linear"
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    8,
+                    9,
+                    12,
+                    12,
+                    16,
+                    16
+                ],
+                "text-max-angle": 30,
+                "text-padding": 50,
+                "text-letter-spacing": 0.15,
+                "text-transform": "uppercase",
+                "text-offset": [
+                    0,
+                    -1
+                ],
+                "symbol-spacing": 400
+            },
+            "paint": {
+                "text-color": "#424242",
+                "text-halo-color": "#f5f5fa",
+                "text-halo-width": 2
+            }
+        },
+        {
+            "id": "health-areas-boundary-label",
+            "type": "symbol",
+            "source": "grid3",
+            "source-layer": "health-areas",
+            "minzoom": 11,
+            "layout": {
+                "symbol-placement": "line",
+                "text-field": [
+                    "concat",
+                    "Aire de santé ",
+                    [
+                        "get",
+                        "airesante"
+                    ]
+                ],
+                "text-font": [
+                    "Noto Sans Regular"
+                ],
+                "text-size": [
+                    "interpolate",
+                    [
+                        "linear"
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    11,
+                    8,
+                    14,
+                    11,
+                    18,
+                    14
+                ],
+                "text-max-angle": 30,
+                "text-padding": 40,
+                "text-letter-spacing": 0.1,
+                "text-transform": "uppercase",
+                "text-offset": [
+                    0,
+                    -1
+                ],
+                "symbol-spacing": 350
+            },
+            "paint": {
+                "text-color": "#616161",
+                "text-halo-color": "#fafafe",
+                "text-halo-width": 1.8
+            }
+        },
+        {
+            "id": "settlement-names-label",
+            "type": "symbol",
+            "source": "grid3",
+            "source-layer": "settlement-names",
+            "minzoom": 11,
+            "layout": {
+                "text-field": [
+                    "get",
+                    "localite"
+                ],
+                "text-font": [
+                    "Noto Sans Regular"
+                ],
+                "text-size": [
+                    "interpolate",
+                    [
+                        "exponential",
+                        1.2
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    10,
+                    6,
+                    14,
+                    9,
+                    18,
+                    12
+                ],
+                "text-padding": [
+                    "interpolate",
+                    [
+                        "linear"
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    10,
+                    2,
+                    14,
+                    8,
+                    16,
+                    12
+                ],
+                "text-max-width": 8,
+                "text-anchor": "center"
+            },
+            "paint": {
+                "text-color": "#4d4d4d",
+                "text-halo-color": "#ffffff",
+                "text-halo-width": 1.5
+            }
+        },
+        {
+            "id": "health-facilities-label",
+            "type": "symbol",
+            "source": "grid3",
+            "source-layer": "health-facilities",
+            "minzoom": 9,
+            "layout": {
+                "text-field": [
+                    "get",
+                    "essnom1"
+                ],
+                "text-transform": "uppercase",
+                "text-font": [
+                    "Noto Sans Regular"
+                ],
+                "text-size": [
+                    "interpolate",
+                    [
+                        "linear"
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    12,
+                    8,
+                    16,
+                    12
+                ],
+                "text-padding": 4,
+                "text-max-width": 10,
+                "text-anchor": "top",
+                "text-offset": [
+                    0,
+                    0.5
+                ],
+                "icon-image": "hospital",
+                "icon-size": 0.8,
+                "icon-optional": true
+            },
+            "paint": {
+                "text-color": "#424242",
+                "text-halo-color": "#fff",
+                "text-halo-width": 1
+            },
+            "halo-blur": 0.5
+        },
+        {
+            "id": "health-areas-centroids-label",
+            "type": "symbol",
+            "source": "grid3",
+            "source-layer": "health-areas-centroids",
+            "minzoom": 10,
+            "maxzoom": 14,
+            "layout": {
+                "text-field": [
+                    "concat",
+                    "",
+                    [
+                    "get",
+                    "airesante"
+                ]],
+                "text-font": [
+                    "Noto Sans Regular"
+                ],
+                "text-size": [
+                    "interpolate",
+                    [
+                        "exponential",
+                        1.2
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    10,
+                    12,
+                    14,
+                    16
+                ],
+                "text-padding": [
+                    "interpolate",
+                    [
+                        "linear"
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    10,
+                    3,
+                    14,
+                    10
+                ],
+                "text-max-width": 7,
+                "text-letter-spacing": 0.05,
+                "text-transform": "uppercase"
+            },
+            "paint": {
+                "text-color": "#F4511E",
+                "text-halo-color": "#f0f0f5",
+                "text-halo-width": 1.2
+            }
+        },
+        {
+            "id": "health-zones-centroids-label",
+            "type": "symbol",
+            "source": "grid3",
+            "source-layer": "health-zones-centroids",
+            "minzoom": 7,
+            "layout": {
+                "text-field": [
+                    "concat",
+                    "ZS ",
+                    [
+                        "get",
+                        "zonesante"
+                    ]
+                ],
+                "text-font": [
+                    "Noto Sans Medium"
+                ],
+                "text-size": [
+                    "interpolate",
+                    [
+                        "linear"
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    8,
+                    10,
+                    12,
+                    16,
+                    16,
+                    22
+                ],
+                "text-padding": [
+                    "interpolate",
+                    [
+                        "linear"
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    8,
+                    5,
+                    12,
+                    15,
+                    16,
+                    20
+                ],
+                "text-max-width": 8,
+                "text-letter-spacing": 0.1,
+                "text-transform": "uppercase"
+            },
+            "paint": {
+                "text-color": "#5E35B1",
+                "text-halo-color": "#e8e8f2",
+                "text-halo-width": 1.5
             }
         }
     ],
