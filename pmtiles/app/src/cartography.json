@@ -13150,6 +13150,19 @@
                     3,
                     16,
                     5
+                ],
+                "line-opacity": [
+                    "interpolate",
+                    [
+                        "linear"
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    7,
+                    0.25,
+                    8,
+                    1
                 ]
             }
         },
@@ -13233,26 +13246,37 @@
                 ]
             }
         },
-        {
-            "id": "health-zones-boundary-label",
+                {
+            "id": "settlement-names-label",
             "type": "symbol",
             "source": "grid3",
-            "source-layer": "health-zones",
-            "minzoom": 8,
+            "source-layer": "settlement-names",
+            "minzoom": 11,
             "layout": {
-                "symbol-placement": "line",
                 "text-field": [
-                    "concat",
-                    "Zone de santé ",
-                    [
-                        "get",
-                        "zonesante"
-                    ]
+                    "get",
+                    "localite"
                 ],
                 "text-font": [
-                    "Noto Sans Medium"
+                    "Noto Sans Regular"
                 ],
                 "text-size": [
+                    "interpolate",
+                    [
+                        "exponential",
+                        1.2
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    11,
+                    7,
+                    14,
+                    8.5,
+                    18,
+                    12
+                ],
+                "text-padding": [
                     "interpolate",
                     [
                         "linear"
@@ -13260,27 +13284,20 @@
                     [
                         "zoom"
                     ],
+                    10,
+                    2,
+                    14,
                     8,
-                    9,
-                    12,
-                    12,
                     16,
-                    16
+                    12
                 ],
-                "text-max-angle": 30,
-                "text-padding": 50,
-                "text-letter-spacing": 0.15,
-                "text-transform": "uppercase",
-                "text-offset": [
-                    0,
-                    -1
-                ],
-                "symbol-spacing": 400
+                "text-max-width": 8,
+                "text-anchor": "center"
             },
             "paint": {
-                "text-color": "#424242",
-                "text-halo-color": "#f5f5fa",
-                "text-halo-width": 2
+                "text-color": "#37474F",
+                "text-halo-color": "#ffffff",
+                "text-halo-width": 1.5
             }
         },
         {
@@ -13325,7 +13342,7 @@
                     0,
                     -1
                 ],
-                "symbol-spacing": 350
+                "symbol-spacing": 150
             },
             "paint": {
                 "text-color": "#616161",
@@ -13333,37 +13350,26 @@
                 "text-halo-width": 1.8
             }
         },
-        {
-            "id": "settlement-names-label",
+                {
+            "id": "health-zones-boundary-label",
             "type": "symbol",
             "source": "grid3",
-            "source-layer": "settlement-names",
-            "minzoom": 11,
+            "source-layer": "health-zones",
+            "minzoom": 8,
             "layout": {
+                "symbol-placement": "line",
                 "text-field": [
-                    "get",
-                    "localite"
+                    "concat",
+                    "Zone de santé ",
+                    [
+                        "get",
+                        "zonesante"
+                    ]
                 ],
                 "text-font": [
-                    "Noto Sans Regular"
+                    "Noto Sans Medium"
                 ],
                 "text-size": [
-                    "interpolate",
-                    [
-                        "exponential",
-                        1.2
-                    ],
-                    [
-                        "zoom"
-                    ],
-                    10,
-                    6,
-                    14,
-                    9,
-                    18,
-                    12
-                ],
-                "text-padding": [
                     "interpolate",
                     [
                         "linear"
@@ -13371,20 +13377,27 @@
                     [
                         "zoom"
                     ],
-                    10,
-                    2,
-                    14,
                     8,
+                    9,
+                    12,
+                    12,
                     16,
-                    12
+                    16
                 ],
-                "text-max-width": 8,
-                "text-anchor": "center"
+                "text-max-angle": 30,
+                "text-padding": 80,
+                "text-letter-spacing": 0.15,
+                "text-transform": "uppercase",
+                "text-offset": [
+                    0,
+                    -1
+                ],
+                "symbol-spacing": 250
             },
             "paint": {
-                "text-color": "#4d4d4d",
-                "text-halo-color": "#ffffff",
-                "text-halo-width": 1.5
+                "text-color": "#424242",
+                "text-halo-color": "#f5f5fa",
+                "text-halo-width": 2
             }
         },
         {
@@ -13392,7 +13405,7 @@
             "type": "symbol",
             "source": "grid3",
             "source-layer": "health-facilities",
-            "minzoom": 9,
+            "minzoom": 10,
             "layout": {
                 "text-field": [
                     "get",
@@ -13400,7 +13413,7 @@
                 ],
                 "text-transform": "uppercase",
                 "text-font": [
-                    "Noto Sans Regular"
+                    "Noto Sans Italic"
                 ],
                 "text-size": [
                     "interpolate",
@@ -13415,19 +13428,42 @@
                     16,
                     12
                 ],
-                "text-padding": 4,
+                "text-padding": [
+                    "interpolate",
+                    [
+                        "linear"
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    9,
+                    12,
+                    16,
+                    18
+                ],
                 "text-max-width": 10,
-                "text-anchor": "top",
+                "text-anchor": "bottom",
                 "text-offset": [
                     0,
-                    0.5
+                    -0.5
                 ],
-                "icon-image": "hospital",
-                "icon-size": 0.8,
+                "icon-image": "capital",
+                "icon-size": ["interpolate"
+                    ,
+                    ["linear"]
+                    ,
+                    ["zoom"]
+                    ,
+                    10,
+                    0.2
+                    ,
+                    18,
+                    1.2
+                ],
                 "icon-optional": true
             },
             "paint": {
-                "text-color": "#424242",
+                "text-color": "#263238",
                 "text-halo-color": "#fff",
                 "text-halo-width": 1
             },
@@ -13439,7 +13475,6 @@
             "source": "grid3",
             "source-layer": "health-areas-centroids",
             "minzoom": 10,
-            "maxzoom": 14,
             "layout": {
                 "text-field": [
                     "concat",
@@ -13460,10 +13495,10 @@
                     [
                         "zoom"
                     ],
-                    10,
+                    15,
                     12,
-                    14,
-                    16
+                    18,
+                    36
                 ],
                 "text-padding": [
                     "interpolate",
@@ -13474,11 +13509,13 @@
                         "zoom"
                     ],
                     10,
-                    3,
-                    14,
-                    10
+                    12,
+                    13,
+                    24,
+                    16,
+                    36
                 ],
-                "text-max-width": 7,
+                "text-max-width": 6,
                 "text-letter-spacing": 0.05,
                 "text-transform": "uppercase"
             },
@@ -13514,6 +13551,8 @@
                     [
                         "zoom"
                     ],
+                    7,
+                    6,
                     8,
                     10,
                     12,
@@ -13541,7 +13580,7 @@
                 "text-transform": "uppercase"
             },
             "paint": {
-                "text-color": "#5E35B1",
+                "text-color": "#37474F",
                 "text-halo-color": "#e8e8f2",
                 "text-halo-width": 1.5
             }
