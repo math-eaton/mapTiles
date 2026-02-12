@@ -631,96 +631,131 @@
             "paint": {
                 "fill-color": [
                     "interpolate",
-                    ["exponential", 2],
-                    ["zoom"],
-                    12,
+                    [
+                        "exponential",
+                        1.6
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    10,
                     [
                         "match",
-                        ["get", "type"],
-                        "Built-up Area", "#DFC8E7",
-                        "Small Settlement Area", "#D7B9E4",
-                        "Hamlet", "#CAA2DD",
+                        [
+                            "get",
+                            "type"
+                        ],
+                        "Built-up Area",
+                        "#CAA2DD",
+                        "Small Settlement Area",
+                        "#D7B9E4",
+                        "Hamlet",
+                        "#DFC8E7",
                         "#FF8C0000"
                     ],
-                    16,
+                    14,
                     [
                         "match",
-                        ["get", "type"],
-                        "Built-up Area", "#EDD9F0",
-                        "Small Settlement Area", "#E6D4ED",
-                        "Hamlet", "#E0D1E8",
+                        [
+                            "get",
+                            "type"
+                        ],
+                        "Built-up Area",
+                        "#E0D1E8",
+                        "Small Settlement Area",
+                        "#E6D4ED",
+                        "Hamlet",
+                        "#EDD9F0",
                         "#FF8C0000"
                     ]
                 ],
                 "fill-opacity": [
                     "interpolate",
-                    ["linear"],
-                    ["zoom"],
+                    [
+                        "linear"
+                    ],
+                    [
+                        "zoom"
+                    ],
                     7,
-                    ["match", ["get", "type"], "Built-up Area", 0, "Hamlet", 0, "Small Settlement Area", 0, 0],
+                    [
+                        "match",
+                        [
+                            "get",
+                            "type"
+                        ],
+                        "Built-up Area",
+                        0,
+                        "Hamlet",
+                        0,
+                        "Small Settlement Area",
+                        0,
+                        0
+                    ],
                     8,
-                    ["match", ["get", "type"], "Built-up Area", 1, "Hamlet", 0, "Small Settlement Area", 0, 0],
-                    9,
-                    ["match", ["get", "type"], "Built-up Area", 1, "Hamlet", 0, "Small Settlement Area", 1, 0],
-                    12,
-                    ["match", ["get", "type"], "Built-up Area", 1, "Hamlet", 1, "Small Settlement Area", 1, 0],
+                    [
+                        "match",
+                        [
+                            "get",
+                            "type"
+                        ],
+                        "Built-up Area",
+                        1,
+                        "Hamlet",
+                        0,
+                        "Small Settlement Area",
+                        0,
+                        0
+                    ],
+                    11,
+                    [
+                        "match",
+                        [
+                            "get",
+                            "type"
+                        ],
+                        "Built-up Area",
+                        1,
+                        "Hamlet",
+                        0,
+                        "Small Settlement Area",
+                        1,
+                        0
+                    ],
+                    13,
+                    [
+                        "match",
+                        [
+                            "get",
+                            "type"
+                        ],
+                        "Built-up Area",
+                        1,
+                        "Hamlet",
+                        1,
+                        "Small Settlement Area",
+                        1,
+                        0
+                    ],
                     16,
-                    ["match", ["get", "type"], "Built-up Area", 1, "Hamlet", 1, "Small Settlement Area", 1, 0]
+                    [
+                        "match",
+                        [
+                            "get",
+                            "type"
+                        ],
+                        "Built-up Area",
+                        1,
+                        "Hamlet",
+                        1,
+                        "Small Settlement Area",
+                        1,
+                        0
+                    ]
                 ]
             }
         },
         {
-            "id": "settlement-extents-outline",
-            "type": "line",
-            "source": "grid3",
-            "source-layer": "settlement-extents",
-            "minzoom": 7,
-            "maxzoom": 16,
-            "layout": {
-                "visibility": "visible"
-            },
-            "paint": {
-                "line-color": [
-                    "match",
-                    ["get", "type"],
-                    "Built-up Area", "#DFC8E7",
-                    "Small Settlement Area", "#CAA2DD",
-                    "Hamlet", "#B580D1",
-                    "#FF8C0000"
-                ],
-                "line-width": [
-                    "interpolate",
-                    ["linear"],
-                    ["zoom"],
-                    7,
-                    ["match", ["get", "type"], "Built-up Area", 0, "Hamlet", 0, "Small Settlement Area", 0, 0],
-                    8,
-                    ["match", ["get", "type"], "Built-up Area", 0.5, "Hamlet", 0, "Small Settlement Area", 0, 0],
-                    9,
-                    ["match", ["get", "type"], "Built-up Area", 0.5, "Hamlet", 0, "Small Settlement Area", 0.5, 0],
-                    12,
-                    ["match", ["get", "type"], "Built-up Area", 0.5, "Hamlet", 0.25, "Small Settlement Area", 0.5, 0],
-                    15,
-                    ["match", ["get", "type"], "Built-up Area", 0.5, "Hamlet", 0.75, "Small Settlement Area", 1, 0]
-                ],
-                "line-opacity": [
-                    "interpolate",
-                    ["linear"],
-                    ["zoom"],
-                    7,
-                    ["match", ["get", "type"], "Built-up Area", 0, "Hamlet", 0, "Small Settlement Area", 0, 0],
-                    8,
-                    ["match", ["get", "type"], "Built-up Area", 0.5, "Hamlet", 0, "Small Settlement Area", 0, 0],
-                    9,
-                    ["match", ["get", "type"], "Built-up Area", 0.5, "Hamlet", 0, "Small Settlement Area", 0.5, 0],
-                    12,
-                    ["match", ["get", "type"], "Built-up Area", 0.6, "Hamlet", 0.6, "Small Settlement Area", 0.6, 0],
-                    15,
-                    ["match", ["get", "type"], "Built-up Area", 0.7, "Hamlet", 0.7, "Small Settlement Area", 0.7, 0]
-                ]
-            }
-        },
-                {
             "id": "water_stream_casing",
             "type": "line",
             "source": "protomaps",
@@ -1438,6 +1473,138 @@
                 ]
             }
         },
+                {
+            "id": "roads_other_casing_late",
+            "type": "line",
+            "source": "protomaps",
+            "source-layer": "roads",
+            "layout": {
+                "visibility": "none"
+            },
+            "filter": [
+                "all",
+                [
+                    "!has",
+                    "is_tunnel"
+                ],
+                [
+                    "!has",
+                    "is_bridge"
+                ],
+                [
+                    "in",
+                    "kind",
+                    "other",
+                    "path"
+                ],
+                [
+                    "!=",
+                    "kind_detail",
+                    "pier"
+                ]
+            ],
+            "paint": {
+                "line-color": "#FAFAFA",
+                "line-gap-width": [
+                    "interpolate",
+                    [
+                        "exponential",
+                        1.2
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    12,
+                    0,
+                    12.25,
+                    0.25,
+                    16,
+                    1
+                ],
+                "line-width": [
+                    "interpolate",
+                    [
+                        "exponential",
+                        1.2
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    12,
+                    0,
+                    12.25,
+                    0.75,
+                    18,
+                    3
+                ]
+            }
+        },
+        {
+            "id": "roads_other",
+            "type": "line",
+            "source": "protomaps",
+            "source-layer": "roads",
+            "filter": [
+                "all",
+                [
+                    "!has",
+                    "is_tunnel"
+                ],
+                [
+                    "!has",
+                    "is_bridge"
+                ],
+                [
+                    "in",
+                    "kind",
+                    "other",
+                    "path"
+                ],
+                [
+                    "!=",
+                    "kind_detail",
+                    "pier"
+                ]
+            ],
+            "paint": {
+                "line-color": [
+                    "interpolate",
+                    [
+                        "exponential",
+                        1.6
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    11,
+                    "#A2AAAD",
+                    14,
+                    "#7C878E"
+                ],
+                "line-dasharray": [
+                    2,
+                    2,
+                    1,
+                    2
+                ],
+                "line-width": [
+                    "interpolate",
+                    [
+                        "exponential",
+                        1.2
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    12,
+                    0.75,
+                    12.25,
+                    1,
+                    18,
+                    4
+                ]
+            }
+        },
         {
             "id": "roads_pier",
             "type": "line",
@@ -1449,7 +1616,8 @@
                 "pier"
             ],
             "paint": {
-                "line-color": ["interpolate",
+                "line-color": [
+                    "interpolate",
                     [
                         "linear"
                     ],
@@ -1665,7 +1833,7 @@
             "source-layer": "roads",
             "minzoom": 12,
             "layout": {
-            "visibility": "visible"
+                "visibility": "visible"
             },
             "filter": [
                 "all",
@@ -1697,9 +1865,9 @@
                     11.5,
                     0,
                     12,
-                    0.5,
+                    2,
                     15,
-                    3,
+                    6.5,
                     18,
                     13
                 ],
@@ -1778,74 +1946,6 @@
                     1,
                     20,
                     15
-                ]
-            }
-        },
-        {
-            "id": "roads_other",
-            "type": "line",
-            "source": "protomaps",
-            "source-layer": "roads",
-            "filter": [
-                "all",
-                [
-                    "!has",
-                    "is_tunnel"
-                ],
-                [
-                    "!has",
-                    "is_bridge"
-                ],
-                [
-                    "in",
-                    "kind",
-                    "other",
-                    "path"
-                ],
-                [
-                    "!=",
-                    "kind_detail",
-                    "pier"
-                ]
-            ],
-            "paint": {
-                "line-color": "#898D8D",
-                "line-dasharray": [
-                    "step",
-                    [
-                        "zoom"
-                    ],
-                    [
-                        "literal",
-                        [
-                            2,
-                            0
-                        ]
-                    ],
-                    12,
-                    [
-                        "literal",
-                        [
-                            2,
-                            2,
-                            1,
-                            2
-                        ]
-                    ]
-                ],
-                "line-width": [
-                    "interpolate",
-                    [
-                        "exponential",
-                        1.2
-                    ],
-                    [
-                        "zoom"
-                    ],
-                    8,
-                    0,
-                    18,
-                    3
                 ]
             }
         },
@@ -2057,7 +2157,7 @@
             "source": "protomaps",
             "source-layer": "roads",
             "layout": {
-                    "visibility": "visible"
+                "visibility": "visible"
             },
             "filter": [
                 "all",
@@ -2461,7 +2561,8 @@
                 ]
             ],
             "paint": {
-                "line-color": ["interpolate",
+                "line-color": [
+                    "interpolate",
                     [
                         "linear"
                     ],
@@ -2508,7 +2609,8 @@
                 ]
             ],
             "paint": {
-                "line-color": ["interpolate",
+                "line-color": [
+                    "interpolate",
                     [
                         "linear"
                     ],
@@ -2573,14 +2675,15 @@
                 ]
             ],
             "paint": {
-                "line-color": ["interpolate",
+                "line-color": [
+                    "interpolate",
                     [
                         "linear"
                     ],
                     [
                         "zoom"
                     ],
-                    14,
+                    11,
                     "#000",
                     16,
                     "#e0e0e0"
@@ -2596,10 +2699,10 @@
                     ],
                     11,
                     0,
-                    12.5,
-                    0.25,
+                    11.5,
+                    2.5,
                     15,
-                    2,
+                    5.5,
                     18,
                     11
                 ],
@@ -2853,7 +2956,8 @@
                 ]
             ],
             "paint": {
-                "line-color": ["interpolate",
+                "line-color": [
+                    "interpolate",
                     [
                         "linear"
                     ],
@@ -2941,6 +3045,201 @@
                     5,
                     18,
                     15
+                ]
+            }
+        },
+                {
+            "id": "settlement-extents-outline",
+            "type": "line",
+            "source": "grid3",
+            "source-layer": "settlement-extents",
+            "minzoom": 7,
+            "maxzoom": 16,
+            "layout": {
+                "visibility": "visible"
+            },
+            "paint": {
+                "line-color": [
+                    "match",
+                    [
+                        "get",
+                        "type"
+                    ],
+                    "Built-up Area",
+                    "#DFC8E7",
+                    "Small Settlement Area",
+                    "#CAA2DD",
+                    "Hamlet",
+                    "#B580D1",
+                    "#FF8C0000"
+                ],
+                "line-width": [
+                    "interpolate",
+                    [
+                        "linear"
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    7,
+                    [
+                        "match",
+                        [
+                            "get",
+                            "type"
+                        ],
+                        "Built-up Area",
+                        0,
+                        "Hamlet",
+                        0,
+                        "Small Settlement Area",
+                        0,
+                        0
+                    ],
+                    8,
+                    [
+                        "match",
+                        [
+                            "get",
+                            "type"
+                        ],
+                        "Built-up Area",
+                        0.5,
+                        "Hamlet",
+                        0,
+                        "Small Settlement Area",
+                        0,
+                        0
+                    ],
+                    9,
+                    [
+                        "match",
+                        [
+                            "get",
+                            "type"
+                        ],
+                        "Built-up Area",
+                        0.5,
+                        "Hamlet",
+                        0,
+                        "Small Settlement Area",
+                        0.5,
+                        0
+                    ],
+                    12,
+                    [
+                        "match",
+                        [
+                            "get",
+                            "type"
+                        ],
+                        "Built-up Area",
+                        0.5,
+                        "Hamlet",
+                        0.25,
+                        "Small Settlement Area",
+                        0.5,
+                        0
+                    ],
+                    15,
+                    [
+                        "match",
+                        [
+                            "get",
+                            "type"
+                        ],
+                        "Built-up Area",
+                        0.5,
+                        "Hamlet",
+                        0.75,
+                        "Small Settlement Area",
+                        1,
+                        0
+                    ]
+                ],
+                "line-opacity": [
+                    "interpolate",
+                    [
+                        "linear"
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    7,
+                    [
+                        "match",
+                        [
+                            "get",
+                            "type"
+                        ],
+                        "Built-up Area",
+                        0,
+                        "Hamlet",
+                        0,
+                        "Small Settlement Area",
+                        0,
+                        0
+                    ],
+                    8,
+                    [
+                        "match",
+                        [
+                            "get",
+                            "type"
+                        ],
+                        "Built-up Area",
+                        0.5,
+                        "Hamlet",
+                        0,
+                        "Small Settlement Area",
+                        0,
+                        0
+                    ],
+                    9,
+                    [
+                        "match",
+                        [
+                            "get",
+                            "type"
+                        ],
+                        "Built-up Area",
+                        0.5,
+                        "Hamlet",
+                        0,
+                        "Small Settlement Area",
+                        0.5,
+                        0
+                    ],
+                    12,
+                    [
+                        "match",
+                        [
+                            "get",
+                            "type"
+                        ],
+                        "Built-up Area",
+                        0.6,
+                        "Hamlet",
+                        0.6,
+                        "Small Settlement Area",
+                        0.6,
+                        0
+                    ],
+                    15,
+                    [
+                        "match",
+                        [
+                            "get",
+                            "type"
+                        ],
+                        "Built-up Area",
+                        0.7,
+                        "Hamlet",
+                        0.7,
+                        "Small Settlement Area",
+                        0.7,
+                        0
+                    ]
                 ]
             }
         },
