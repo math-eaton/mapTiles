@@ -169,9 +169,9 @@ LAYER_SETTINGS = {
         '--no-polygon-splitting',  # Keep polygons intact across tile boundaries
         '--no-simplification-of-shared-nodes',  # Preserve shared boundaries identically
         '--simplification=1',
-        '--low-detail=8',
-        '--full-detail=12',
-        '--coalesce-densest-as-needed',  # Merge features when needed, maintaining coverage
+        '--low-detail=12',
+        '--full-detail=16',
+        # '--coalesce-densest-as-needed',  # Merge features when needed, maintaining coverage
         '--extend-zooms-if-still-dropping-maximum=15',
         '--no-tiny-polygon-reduction',
         '-y', 'airesante',
@@ -187,9 +187,9 @@ LAYER_SETTINGS = {
         '--no-polygon-splitting',  # Keep polygons intact across tile boundaries
         '--no-simplification-of-shared-nodes',  # Preserve shared boundaries identically
         '--simplification=1', 
-        '--low-detail=8',
-        '--full-detail=12',
-        '--coalesce-densest-as-needed',  # Merge features when needed, maintaining coverage
+        '--low-detail=12',
+        '--full-detail=16',
+        # '--coalesce-densest-as-needed',  # Merge features when needed, maintaining coverage
         '--extend-zooms-if-still-dropping-maximum=15',
         '--no-tiny-polygon-reduction',
         '-y', 'zonesante',

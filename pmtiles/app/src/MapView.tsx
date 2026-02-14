@@ -163,26 +163,31 @@ function getMaplibreStyle(demSource: any): StyleSpecification {
   // contour steps in meters (each pair is [minor, major] contour intervals for that zoom level)
   // nb: mapterhorn dem source is high res, so very small contour invervals
   // will run into maplibre-gl vertex limits
-  style.sources.contours = {
-    type: "vector",
-    tiles: [
-      demSource.contourProtocolUrl({
-        multiplier: 1, // Keep meters
-        thresholds: {
-          // 8.5: [500, 5000],
-          10.5: [50, 500],
-          // 11.5: [500, 5000],
-          // 12.5: [100, 1000],
-          13.5: [25, 250],
-          14.5: [10, 100],
-        },
-        elevationKey: "ele",
-        levelKey: "level",
-        contourLayer: "contours",
-      }),
-    ],
-    minzoom: 10,
-  };
+style.sources.contours = {
+  type: "vector",
+  tiles: [
+    demSource.contourProtocolUrl({
+      multiplier: 1, // meters
+      thresholds: {
+        10.5: [60, 300],
+
+        11.5: [50, 250],
+
+        12.5: [20, 100],
+
+        13.5: [10, 50],
+
+        14.5: [10, 50],
+
+        15.5: [5, 25],
+      },
+      elevationKey: "ele",
+      levelKey: "level",
+      contourLayer: "contours",
+    }),
+  ],
+  minzoom: 10,
+};
 
   // Add global light source for 3D features
   style.light = {

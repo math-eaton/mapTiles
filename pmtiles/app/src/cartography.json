@@ -155,7 +155,7 @@
                 ]
             }
         },
-                {
+        {
             "id": "settlement-extents",
             "type": "fill",
             "source": "grid3",
@@ -657,9 +657,9 @@
                     9,
                     0,
                     12,
-                    0.5,
+                    0.6,
                     16,
-                    0.7
+                    0.8
                 ],
                 "line-width": [
                     "interpolate",
@@ -677,8 +677,8 @@
                             "level"
                         ],
                         1,
-                        0.2,
-                        0.2
+                        0.35,
+                        0.25
                     ],
                     12,
                     [
@@ -10868,7 +10868,7 @@
                 "text-transform": "uppercase"
             },
             "paint": {
-                "text-color": "#8f8f8f",
+                "text-color": "#263238",
                 "text-halo-color": "#e0e0e0",
                 "text-halo-width": 1
             }
@@ -13115,7 +13115,8 @@
                 "line-width": [
                     "interpolate",
                     [
-                        "linear"
+                        "exponential",
+                        1.5
                     ],
                     [
                         "zoom"
@@ -13130,7 +13131,8 @@
                 "line-gap-width": [
                     "interpolate",
                     [
-                        "linear"
+                        "exponential",
+                        1.5
                     ],
                     [
                         "zoom"
@@ -13138,9 +13140,9 @@
                     10,
                     0,
                     10.5,
-                    3,
+                    1,
                     16,
-                    5
+                    6
                 ],
                 "line-opacity": [
                     "interpolate",
@@ -13157,7 +13159,7 @@
                 ]
             }
         },
-                {
+        {
             "id": "health-areas-boundary-early",
             "type": "line",
             "source": "grid3",
@@ -13280,7 +13282,7 @@
                 "line-opacity": 1
             }
         },
-                {
+        {
             "id": "settlement-names-label",
             "type": "symbol",
             "source": "grid3",
@@ -13384,7 +13386,7 @@
                 "text-halo-width": 1.8
             }
         },
-                {
+        {
             "id": "health-zones-boundary-label",
             "type": "symbol",
             "source": "grid3",
@@ -13482,15 +13484,16 @@
                     -0.5
                 ],
                 "icon-image": "capital",
-                "icon-size": ["interpolate"
-                    ,
-                    ["linear"]
-                    ,
-                    ["zoom"]
-                    ,
+                "icon-size": [
+                    "interpolate",
+                    [
+                        "linear"
+                    ],
+                    [
+                        "zoom"
+                    ],
                     10,
-                    0.2
-                    ,
+                    0.2,
                     18,
                     1.2
                 ],
@@ -13512,10 +13515,35 @@
             "layout": {
                 "text-field": [
                     "step",
-                    ["zoom"],
-                    ["concat", "", ["get", "airesante"]],
-                    13,
-                    ["concat", "AS ", ["get", "airesante"]]
+                    [
+                        "zoom"
+                    ],
+                    [
+                        "concat",
+                        "AS ",
+                        [
+                            "get",
+                            "airesante"
+                        ]
+                    ],
+                    10,
+                    [
+                        "concat",
+                        "AS ",
+                        [
+                            "get",
+                            "airesante"
+                        ]
+                    ],
+                    12,
+                    [
+                        "concat",
+                        "",
+                        [
+                            "get",
+                            "airesante"
+                        ]
+                    ]
                 ],
                 "text-font": [
                     "Noto Sans Regular"
@@ -13523,89 +13551,70 @@
                 "text-size": [
                     "interpolate",
                     [
-                        "exponential",
-                        1.2
+                        "linear"
                     ],
                     [
                         "zoom"
                     ],
                     10,
                     [
-                        "interpolate",
+                        "*",
+                        9,
                         [
-                            "linear"
-                        ],
-                        [
-                            "log10",
+                            "+",
+                            0.7,
                             [
-                                "+",
+                                "*",
+                                2,
                                 [
-                                    "get",
-                                    "Shape__Area"
-                                ],
-                                0.000001
+                                    "sqrt",
+                                    [
+                                        "get",
+                                        "Shape__Area"
+                                    ]
+                                ]
                             ]
-                        ],
-                        -6,
-                        4,
-                        -2,
-                        7,
-                        -0.5,
-                        10,
-                        0,
-                        16
+                        ]
                     ],
                     13,
                     [
-                        "interpolate",
+                        "*",
+                        36,
                         [
-                            "linear"
-                        ],
-                        [
-                            "log10",
+                            "+",
+                            0.3,
                             [
-                                "+",
+                                "*",
+                                2,
                                 [
-                                    "get",
-                                    "Shape__Area"
-                                ],
-                                0.000001
+                                    "sqrt",
+                                    [
+                                        "get",
+                                        "Shape__Area"
+                                    ]
+                                ]
                             ]
-                        ],
-                        -6,
-                        5,
-                        -2,
-                        8.5,
-                        -0.5,
-                        13,
-                        0,
-                        20
+                        ]
                     ],
                     18,
                     [
-                        "interpolate",
+                        "*",
+                        36,
                         [
-                            "linear"
-                        ],
-                        [
-                            "log10",
+                            "+",
+                            0.8,
                             [
-                                "+",
+                                "*",
+                                2,
                                 [
-                                    "get",
-                                    "Shape__Area"
-                                ],
-                                0.000001
+                                    "sqrt",
+                                    [
+                                        "get",
+                                        "Shape__Area"
+                                    ]
+                                ]
                             ]
-                        ],
-                        -6,
-                        18,
-                        -2,
-                        31,
-                        -0.5,
-                        47,
-                        0,
-                        72
+                        ]
                     ]
                 ],
                 "text-padding": [
@@ -13623,8 +13632,9 @@
                     16,
                     24
                 ],
-                "text-max-width": 6,
-                "text-letter-spacing": ["interpolate",
+                "text-max-width": 4,
+                "text-letter-spacing": [
+                    "interpolate",
                     [
                         "exponential",
                         1.6
@@ -13640,17 +13650,17 @@
                 "text-transform": "uppercase"
             },
             "paint": {
-                "text-color":
-                    ["interpolate",
+                "text-color": [
+                    "interpolate",
                     [
                         "linear"
                     ],
                     [
                         "zoom"
                     ],
-                    13,
+                    12,
                     "#464646",
-                    14,
+                    13,
                     "#DD2C00"
                 ],
                 "text-halo-color": "#f0f0f5",
@@ -13666,10 +13676,35 @@
             "layout": {
                 "text-field": [
                     "step",
-                    ["zoom"],
-                    ["concat", "Zone de santé ", ["get", "zonesante"]],
-                    12,
-                    ["get", "zonesante"]
+                    [
+                        "zoom"
+                    ],
+                    [
+                        "concat",
+                        "ZS ",
+                        [
+                            "get",
+                            "zonesante"
+                        ]
+                    ],
+                    11,
+                    [
+                        "concat",
+                        "",
+                        [
+                            "get",
+                            "zonesante"
+                        ]
+                    ],
+                    13,
+                    [
+                        "concat",
+                        "ZS ",
+                        [
+                            "get",
+                            "zonesante"
+                        ]
+                    ]
                 ],
                 "text-font": [
                     "Noto Sans Medium"
@@ -13684,111 +13719,63 @@
                     ],
                     7,
                     [
-                        "interpolate",
+                        "*",
+                        6,
                         [
-                            "exponential",
-                            1.2
-                        ],
-                        [
-                            "log10",
+                            "+",
+                            1,
                             [
-                                "+",
+                                "*",
+                                0.5,
                                 [
-                                    "get",
-                                    "Shape__Area"
-                                ],
-                                0.0001
+                                    "sqrt",
+                                    [
+                                        "get",
+                                        "Shape__Area"
+                                    ]
+                                ]
                             ]
-                        ],
-                        -4,
-                        4.5,
-                        -2,
-                        5.4,
-                        -0.5,
-                        6.6,
-                        0.5,
-                        8.4
-                    ],
-                    8,
-                    [
-                        "interpolate",
-                        [
-                            "exponential",
-                            1.2
-                        ],
-                        [
-                            "log10",
-                            [
-                                "+",
-                                [
-                                    "get",
-                                    "Shape__Area"
-                                ],
-                                0.0001
-                            ]
-                        ],
-                        -4,
-                        6.75,
-                        -2,
-                        8.1,
-                        -0.5,
-                        9.9,
-                        0.5,
-                        12.6
+                        ]
                     ],
                     12,
                     [
-                        "interpolate",
+                        "*",
+                        14,
                         [
-                            "exponential",
-                            1.2
-                        ],
-                        [
-                            "log10",
+                            "+",
+                            1,
                             [
-                                "+",
+                                "*",
+                                0.5,
                                 [
-                                    "get",
-                                    "Shape__Area"
-                                ],
-                                0.0001
+                                    "sqrt",
+                                    [
+                                        "get",
+                                        "Shape__Area"
+                                    ]
+                                ]
                             ]
-                        ],
-                        -4,
-                        10.5,
-                        -2,
-                        12.6,
-                        -0.5,
-                        15.4,
-                        0.5,
-                        19.6
+                        ]
                     ],
-                    16,
+                    14,
                     [
-                        "interpolate",
+                        "*",
+                        42,
                         [
-                            "exponential",
-                            1.2
-                        ],
-                        [
-                            "log10",
+                            "+",
+                            0.5,
                             [
-                                "+",
+                                "*",
+                                0.5,
                                 [
-                                    "get",
-                                    "Shape__Area"
-                                ],
-                                0.0001
+                                    "sqrt",
+                                    [
+                                        "get",
+                                        "Shape__Area"
+                                    ]
+                                ]
                             ]
-                        ],
-                        -4,
-                        16.5,
-                        -2,
-                        19.8,
-                        -0.5,
-                        24.2,
-                        0.5,
-                        30.8
+                        ]
                     ]
                 ],
                 "text-padding": [
@@ -13807,7 +13794,8 @@
                     20
                 ],
                 "text-max-width": 8,
-                "text-letter-spacing": ["interpolate",
+                "text-letter-spacing": [
+                    "interpolate",
                     [
                         "exponential",
                         1.6
@@ -13816,7 +13804,7 @@
                         "zoom"
                     ],
                     7,
-                    0.5,
+                    0.25,
                     10,
                     0.15
                 ],
